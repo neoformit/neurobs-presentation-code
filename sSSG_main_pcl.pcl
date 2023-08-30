@@ -1,0 +1,487 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# MAIN PCL FILE													#
+#																		#
+#######################################################
+
+#######################################################
+# SET VARIABLES THAT CAN BE ADJUSTED BY EXPERIMENTER
+
+int val_dur	  						= 5;		# duration of presentation valuable outcomes in seconds (!)
+
+int ITI_pavl						= 500; 	# duration of ITI Pavl training in ms
+int mov_dur_pavl   				= 1000;	# duration of presentation of stimulus + vendor, response window
+int fb_dur_pavl    				= 1000;	# duration of presentation of the outcome / banner
+
+int ITImin   						= 1000;	# min duration of the ITI in ms
+int ITImax   						= 1500;	# max duration of the ITI in ms
+int mov_dur   						= 800;	# duration of presentation of stimulus + vendor, response window
+int delay_dur 						= 0;		# duration of delay, vendor no longer presented; delay of 0 sec doesn't work, now not presented during training
+int fb_dur    						= 700;	# duration of presentation of the outcome / banner
+
+int ITImin_test					= 1000;	# min duration of the ITI in ms
+int ITImax_test					= 1000;	# max duration of the ITI in ms
+
+int mov_dur_test1					= 800; 	# duration of presentation of stimulus + vendor in test phase (SHORT): old = 800/ young = 500
+int mov_dur_test2					= 1100; 	# duration of presentation of stimulus + vendor in test phase (LONG): old = 1100 / young = 800
+#int delay_dur_test				= 500;	# duration of delay, vendor no longer presented => part of the ITI, but separate to log late responses
+int fb_dur_test					= 500;	# duration of presentation of the outcome / banner
+
+int score_dur						= 5000;	# duration of presentation of scores at end of block in ms
+int br_dur	  						= 10;		# break duration in seconds(!)
+
+int demo_nr_blocks_train		= 2;		# nr of practice training blocks --> 
+int demo_nr_blocks_test			= 0;		# nr of practice test blocks
+
+# int nr_blocks_train_pavl		= 2;		# Is now two separate blocks with SO in between, adjust manually below
+int nr_blocks_train				= 24;		# WAS 8; total nr of training blocks, including both odd and even
+#int nr_blocks_train_int			= 2;		# WAS 8;
+#int nr_blocks_train_int_mri	= 24;		
+
+int break_blocks					= 6; 		# break after how many blocks
+
+int nr_blocks_test				= 2;		# 6  = nr of test blocks (per test)
+
+# Note that changing the values below may require additional adjustments
+int nr_stim_per_block_train_pavl	= 8;		# nr of stimuli presented in each block during training
+int nr_stim_rep_train_pavl			= 2;		# nr of presentations of each stimulus in a block during training
+
+
+int nr_stim_per_block_train	= 4;		# nr of stimuli presented in each block during training
+int nr_stim_rep_train			= 4;		# nr of presentations of each stimulus in a block during training
+
+int nr_stim_per_block_test		= 8;		# nr of stimuli presented in each block during test
+int nr_stim_rep_test				= 4;		# nr of presentations of each stimulus in a block during test
+
+#int nr_intentions_per_block	= 4;		# nr of intentions (= nr of stim/outc) per training block
+#int nr_intention_repetitions	= 2;		# nr of repetitions of the intentions before each block
+#int intention_dur					= 2500;	# duration of the presentation (and resp window) of each intention in seconds(!)
+
+/* jittered ITI for scanner 1-5 sec
+array <int> iti_time[0];
+int current_iti = 1;
+
+input_file fn_iti  = new input_file;
+
+fn_iti.open("iti.txt");
+
+# Store stim_out_set matrix
+loop int p=1 until p>192 begin;
+	int iti = fn_iti.get_int();
+	iti_time.add(iti);
+	p=p+1;
+end;
+fn_iti.close();
+
+
+iti_time.shuffle(  1, 32);
+iti_time.shuffle( 33, 64);
+iti_time.shuffle( 65, 96);
+iti_time.shuffle( 97,128);
+iti_time.shuffle(129,160);
+iti_time.shuffle(161,192);
+*/
+
+#######################################################
+# EXPERIMENTER INPUT
+
+# Test condition: ii or gi
+#keyboard_instr_text.set_caption("Experimenter input: which condition?");
+#keyboard_instr_text.redraw();
+#start_intention = int(system_keyboard.get_input( keyboard_input_pic, keyboard_input_text ));
+
+
+# Task part to start with (see at the bottom of this script)
+keyboard_instr_text.set_caption("Experimenter input: start with which part?");
+keyboard_instr_text.redraw();
+int task_part = int(system_keyboard.get_input( keyboard_input_pic, keyboard_input_text ));
+
+start_intention = mod(int(logfile.subject()),2) + 1; #determine start intention based on subject number: even=start II
+
+#######################################################
+# PARTICIPANT INPUT: Choose skateboarder
+
+#loop bool sk=false until sk==true begin;
+#	skateboarder = int(system_keyboard.get_input( skateboard_pic, skateboard_input ));
+#	if skateboarder==1 || skateboarder==2 then sk=true; end;
+#end;
+
+#if     skateboarder==1 then score_pic.set_part(1,bmp_points_boy);
+#elseif skateboarder==2 then score_pic.set_part(1,bmp_points_girl);
+#end;
+
+#######################################################
+# VARIABLES THAT ARE SET AUTOMATICALLY
+
+# Determine number of trials per block and fill them:
+# 0. for Pavl training
+int blocktrials_train_pavl = nr_stim_per_block_train_pavl * nr_stim_rep_train_pavl;
+array <int> trial_order_training_pavl[blocktrials_train_pavl];
+nr_stim=nr_stim_per_block_train_pavl; nr_rep=nr_stim_rep_train_pavl;
+loop int k=1 until k>nr_rep begin;
+	loop int l=1 until l>nr_stim begin;
+		trial_order_training_pavl[k*nr_stim-nr_stim+l]=l;
+		l=l+1;
+	end;
+	k=k+1;
+end;
+
+# 1. for Pavl training
+int blocktrials_train = nr_stim_per_block_train * nr_stim_rep_train;
+array <int> trial_order_training[blocktrials_train];
+nr_stim=nr_stim_per_block_train; nr_rep=nr_stim_rep_train;
+loop int k=1 until k>nr_rep begin;
+	loop int l=1 until l>nr_stim begin;
+		trial_order_training[k*nr_stim-nr_stim+l]=l;
+		l=l+1;
+	end;
+	k=k+1;
+end;
+
+# 2. for test
+int blocktrials_test  = nr_stim_per_block_test * nr_stim_rep_test;
+array <int> trial_order_test[blocktrials_test];
+nr_stim=nr_stim_per_block_test; nr_rep=nr_stim_rep_test;
+loop int k=1 until k>nr_rep begin;
+	loop int l=1 until l>nr_stim begin;
+		trial_order_test[k*nr_stim-nr_stim+l]=l;
+		l=l+1;
+	end;
+	k=k+1;
+end;
+
+# Create stimulus-outcome relation matrices
+array <int> stim_out_set[3][8];
+array <int> demo_stim_out_set[3][8];
+array <int> real_stim_out_set[3][8];
+
+demo_stim_out_set[1]={1,2,3,4,1,2,3,4};	# stimulus to present
+demo_stim_out_set[2]={1,2,3,4,1,2,3,4};	# outcome related to the stimulus
+demo_stim_out_set[3]={1,1,0,0,1,1,0,0};	# outcome valuable during training or not
+
+real_stim_out_set[1]={1,2,3,4,5,6,7,8};	# stimulus to present
+array <int> outnr[]={1,2,3,4}; outnr.shuffle(); #outnr.append(outnr); #shuffle outcomes
+real_stim_out_set[2][1]=outnr[1];
+real_stim_out_set[2][2]=outnr[2]; 
+real_stim_out_set[2][3]=outnr[3]; 
+real_stim_out_set[2][4]=outnr[4]; 
+real_stim_out_set[2][5]=outnr[1]; 
+real_stim_out_set[2][6]=outnr[2]; 
+real_stim_out_set[2][7]=outnr[3];
+real_stim_out_set[2][8]=outnr[4];	# outcome related to the stimulus
+#real_stim_out_set[2]={1,2,3,4,1,2,3,4};	# outcome related to the stimulus
+real_stim_out_set[3]={1,1,0,0,0,0,1,1};	# outcome valuable during training or not
+real_stim_out_set[1].shuffle(); 				# shuffle stimuli to ensure that relations with outcomes and values differ over pps
+
+# Create matrices of used stimuli and valuable outcomes for test
+array <int> test_val_set[6][2][2];
+array <int> demo_test_val_set[6][2][2];
+array <int> real_test_val_set[6][2][2];	# 1st dimension should match nr of test blocks, adjust if more test blocks are used (also below)
+array <int> test_val_set_4stim[4][2][2];	# 1st dimension should match nr of test blocks, adjust if more test blocks are used (also below)
+array <int> test_val_set_8stim[2][2][2];	# 1st dimension should match nr of test blocks, adjust if more test blocks are used (also below)
+
+demo_test_val_set[1]={{1,3},{2,4}}; 		# {{valuable},{non-valuable}} outcomes
+demo_test_val_set[2]={{2,4},{1,3}};
+demo_test_val_set[3]={{1,2},{3,4}};
+demo_test_val_set[4]={{3,4},{1,2}};
+
+real_test_val_set[1]={{1,2},{3,4}};
+real_test_val_set[2]={{3,4},{1,2}};
+real_test_val_set[3]={{1,3},{2,4}};			
+real_test_val_set[4]={{2,4},{1,3}};
+real_test_val_set[5]={{1,4},{2,3}};			
+real_test_val_set[6]={{2,3},{1,4}};
+real_test_val_set.shuffle(); 					# shuffle block order in test
+
+
+
+array <int> blockstim_stim[24][16];
+blockstim_stim[1]={1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4};
+blockstim_stim[2]={1,7,6,4,1,7,6,4,1,7,6,4,1,7,6,4};
+blockstim_stim[3]={1,8,3,6,1,8,3,6,1,8,3,6,1,8,3,6};
+blockstim_stim[4]={7,8,5,6,7,8,5,6,7,8,5,6,7,8,5,6};
+blockstim_stim[5]={2,8,5,3,2,8,5,3,2,8,5,3,2,8,5,3};
+blockstim_stim[6]={2,7,5,4,2,7,5,4,2,7,5,4,2,7,5,4};
+blockstim_stim[7]={1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4};
+blockstim_stim[8]={1,7,6,4,1,7,6,4,1,7,6,4,1,7,6,4};
+blockstim_stim[9]={1,8,3,6,1,8,3,6,1,8,3,6,1,8,3,6};
+blockstim_stim[10]={7,8,5,6,7,8,5,6,7,8,5,6,7,8,5,6};
+blockstim_stim[11]={2,8,5,3,2,8,5,3,2,8,5,3,2,8,5,3};
+blockstim_stim[12]={2,7,5,4,2,7,5,4,2,7,5,4,2,7,5,4};
+blockstim_stim[13]={1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4};
+blockstim_stim[14]={1,7,6,4,1,7,6,4,1,7,6,4,1,7,6,4};
+blockstim_stim[15]={1,8,3,6,1,8,3,6,1,8,3,6,1,8,3,6};
+blockstim_stim[16]={7,8,5,6,7,8,5,6,7,8,5,6,7,8,5,6};
+blockstim_stim[17]={2,8,5,3,2,8,5,3,2,8,5,3,2,8,5,3};
+blockstim_stim[18]={2,7,5,4,2,7,5,4,2,7,5,4,2,7,5,4};
+blockstim_stim[19]={1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4};
+blockstim_stim[20]={1,7,6,4,1,7,6,4,1,7,6,4,1,7,6,4};
+blockstim_stim[21]={1,8,3,6,1,8,3,6,1,8,3,6,1,8,3,6};
+blockstim_stim[22]={7,8,5,6,7,8,5,6,7,8,5,6,7,8,5,6};
+blockstim_stim[23]={2,8,5,3,2,8,5,3,2,8,5,3,2,8,5,3};
+blockstim_stim[24]={2,7,5,4,2,7,5,4,2,7,5,4,2,7,5,4};
+
+blockstim_stim.shuffle(1,  6);
+blockstim_stim.shuffle(7, 12);
+blockstim_stim.shuffle(13,  18);
+blockstim_stim.shuffle(19,  24);
+
+array <int> blockstim_val[24][4];
+loop int i = 1 until i > 24 begin
+blockstim_val[i][1]=blockstim_stim[i][1];
+blockstim_val[i][2]=blockstim_stim[i][2];
+blockstim_val[i][3]=blockstim_stim[i][3];
+blockstim_val[i][4]=blockstim_stim[i][4];
+i = i+1;
+end;
+
+loop int b=1 until b>24 begin
+	loop int i=1 until i>4 begin
+		if ( i==i) then blockstim_stim[b].shuffle(1,4);
+		else
+			bool OK = false;
+		
+			loop until OK begin
+				blockstim_stim[b].shuffle((i-1)*4+1,(i-1)*4+4);	
+				if ( blockstim_stim[b][(i-1)*4] != blockstim_stim[b][(i-1)*4+1] ) then OK = true; end;
+			end;	
+		end;
+		i=i+1;
+	end;
+	b=b+1;
+end;
+#term.print(blockstim_within);
+
+
+#######################################################
+# INCLUDE PCL FILES WITH SUBROUTINES
+#read_stimout_file(); # necessary if task is done on two separate computers: create those first and than load them. 
+#read_testval_file(); 
+include "sSSG_sub1a_write_info.pcl";
+include "sSSG_sub1b_write_matrices.pcl";
+include "sSSG_sub2_create_output_files.pcl";
+include "sSSG_sub3_present_instructions.pcl";
+
+include "sSSG_sub5a_show_outcomes.pcl";
+include "sSSG_sub5b_check_outcomes.pcl";
+#include "sSSG_sub5c_present_intentions.pcl";
+include "sSSG_sub5d_run_trials.pcl";
+
+include "sSSG_sub4_run_task.pcl"; # must be included after subparts (5) to avoid errors
+
+include "sSSG_sub6_SOtest.pcl";
+include "sSSG_sub7_SRBAI.pcl";
+
+#######################################################
+# CREATE OUTPUTFILES
+
+# save values of important variables and matrices
+create_info_file(); 
+
+# start output files for all task parts
+create_output_file_showoutcomes();
+#create_output_file_checkoutcomes();
+create_output_file_intentions();
+create_output_file_train();
+create_output_file_test();
+create_output_file_SOcheck();
+create_output_file_SRBAI();
+#create_output_file_triggers();
+
+#######################################################
+#######################################################
+# RUN ALL PARTS OF THE DEMO AND TASK
+add_intentions=0;
+
+randnr=mod(int(real_stim_out_set[1][1]),2) + 1; #determines which side the green value sceen is presented; now depends on whether first stim is odd/even
+# term.print(randnr);
+
+loop bool run=false until run==true begin;
+
+	runtrials=1;
+	
+	################################################
+	if 	 task_part==1 then			# If starting from the start, save stimout and testval matrices
+		create_stimout_file();
+		create_testval_file();
+	elseif task_part >1 then			# If restarting later in task, load the correct matrices
+		read_stimout_file();
+		read_testval_file();
+	end;
+
+	################################################
+	# Run instructions and practice training
+
+	# present training practice instructions
+	if task_part ==  1 then start_screen = 1;
+								   end_screen   = 28;
+								   present_instructions(); end;
+	
+	# present training practice
+	if task_part ==  2 then demoORreal	 = 1;
+								   trainORtest  = 1;
+								   end_block    = demo_nr_blocks_train; 
+								   run_task(); 				end;
+
+
+	################################################
+	# Run first part: Pavlovian training - block 1
+	
+
+	# present instructions pavlovian training
+	if task_part ==  3 then start_screen = 29;
+								   end_screen   = 37;
+								   present_instructions(); end;
+	
+	# Pavl training
+	if task_part ==  4 then demoORreal	 = 0;
+								   trainORtest  = 0;
+								   no_val_screen = 1; # just don't show val-screens here	
+								   end_block    = 1; # just one block
+								   run_task(); 				end;
+
+	################################################
+	# Run SO test 1
+	# present instructions SO test
+	if task_part == 5 then start_screen = 38;
+								   end_screen   = 38;
+								   present_instructions(); end;
+
+	# run S-O test
+	if task_part == 6 then SO_test(); end;
+	
+	
+		################################################
+	# Run first part: Pavlovian training - block 2
+
+	# present instructions pavl training 2
+	if task_part ==  7 then start_screen = 39;
+								   end_screen   = 39;
+								   present_instructions(); end;
+	
+	# Pavl training
+	if task_part ==  8 then demoORreal	 = 0;
+								   trainORtest  = 0;
+								   no_val_screen = 1; # just don't show val-screens here	
+								   end_block    = 1; # just one block
+								   run_task(); 				end;
+
+	################################################
+	# Run SO test 2
+	# present instructions SO test
+	if task_part == 9 then start_screen = 40;
+								   end_screen   = 40;
+								   present_instructions(); end;
+
+	# run S-O test
+	if task_part == 10 then SO_test(); end;
+	
+	################################################
+	# Run second part: instrumental training
+	no_val_screen = 0; 
+		# present instructions real task
+	if task_part ==  11 then start_screen = 41;
+								   end_screen   = 45;
+								   present_instructions(); end;
+	
+	# Instrumental training
+	if task_part ==  12 then demoORreal	 = 0;
+								   trainORtest  = 1;
+								   end_block    = nr_blocks_train; 
+								   run_task(); 				end;
+
+	################################################
+	# Run SO test 3
+	# present instructions SO test
+	if task_part == 13 then start_screen = 46;
+								   end_screen   = 46;
+								   present_instructions(); end;
+
+	# run S-O test
+	if task_part == 14 then SO_test(); end;
+
+	################################################
+	# Run SRBAI
+	
+	if task_part ==  15 then start_screen = 47;
+								   end_screen   = 47;
+								   present_instructions(); end;
+	
+	if task_part == 16 then SRBAI(); end;						
+	
+	################################################
+	# Run instructions and practice test
+		
+
+	# present instructions practice test
+#	if task_part == 10 then start_screen = 55;
+#								   end_screen   = 58;
+#								   present_instructions(); end;
+
+	# present test practice without intentions
+#	if task_part == 11 then demoORreal	 = 1;
+#								   trainORtest  = 2;
+#								   end_block    = demo_nr_blocks_test; 
+#								   run_task();	 				end;
+								
+	################################################
+	# Run test
+	
+	# present instructions test 1 (fast)
+	if task_part == 17 then start_screen = 48;
+								   end_screen   = 52;
+								   present_instructions(); end;								
+
+	# run real task: test 1 (fast)
+	if task_part == 18 then 
+	# mri			 = 1;
+									demoORreal	 = 0;
+							      trainORtest   = 2;
+								   end_block     = 2;
+									test_run = 1;								
+								   run_task();	 				
+	end;
+	
+	# present instructions test 2 (slow)
+	if task_part == 19 then start_screen = 53;
+								   end_screen   = 53;
+								   present_instructions(); end;								
+
+	# run real task: test 2 (slow)
+	if task_part == 20 then 
+	# mri			 = 1;
+									demoORreal	 = 0;
+							      trainORtest   = 2;
+									test_run = 2;
+									start_block = 3;
+								   end_block     = 4;
+								   run_task();	 				
+	end;
+	
+		if task_part == 21 then start_screen = 54;
+								   end_screen   = 54;
+								   present_instructions(); end;								
+
+	task_part=task_part+1;
+	
+	if task_part > 21 then 
+		start_text.set_caption("Quitting the experiment...");
+		start_text.redraw();
+		startTrial.present();
+
+		run=true; end;
+end;
+
+#######################################################
+#######################################################
+
+# close output files
+out_info.close();
+out_show.close();
+#out_check.close();
+out_train.close();
+out_test.close();
+out_so.close();
+#out_triggers.close();
