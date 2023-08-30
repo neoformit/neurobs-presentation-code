@@ -1,0 +1,131 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: show valuable outcomes						#
+#																		#
+#######################################################
+
+sub show_outcomes begin
+	
+	#######################################################
+	# Set active buttons for this part: no active buttons
+	response_manager.set_button_active(1,false);
+	response_manager.set_button_active(2,false);
+	response_manager.set_button_active(3,false);
+	response_manager.set_button_active(4,false);
+	response_manager.set_button_active(5,false);
+
+	#######################################################
+	# Set correct picture parts; valuable/not valuable outcomes switch sides
+	array <int> boxsides[6];
+	array <int> valnr[2];
+	array <int> novalnr[2];
+
+	if 	 randnr == 1 then	
+		boxsides = {1,2,3,4,5,6};   # green box on the left
+		valnr    = {7,8};			    # location of outcome pictures
+		novalnr  = {9,10};
+	elseif randnr == 2 then 
+		boxsides = {4,5,6,1,2,3};   # red box on the left
+		valnr    = {9,10};		    # location of outcome pictures
+		novalnr  = {7,8};
+	end;
+
+	# Put the boxes in the correct position
+	outcomes_pic.set_part(boxsides[1],box_green);
+	outcomes_pic.set_part(boxsides[2],box_green_center);
+	outcomes_pic.set_part(boxsides[3],bmp_plus);
+	outcomes_pic.set_part(boxsides[4],box_red);
+	outcomes_pic.set_part(boxsides[5],box_red_center);
+	outcomes_pic.set_part(boxsides[6],bmp_minus);
+					
+	# Put the outcome pictures for this part in the correct positions
+	if trainORtest==1 then								# TRAINING
+		if     demoORreal==1 then  					# demo
+				outcomes_pic.set_part(  valnr[1],pizza_pics[stim_out_set[2][1]]);
+				outcomes_pic.set_part(  valnr[2],pizza_pics[stim_out_set[2][2]]);
+				outcomes_pic.set_part(novalnr[1],pizza_pics[stim_out_set[2][3]]);
+				outcomes_pic.set_part(novalnr[2],pizza_pics[stim_out_set[2][4]]);
+		elseif demoORreal==0 then						# real
+#			if (task_part == 4) then # 6-block version
+				outcomes_pic.set_part(   valnr[1],icecream_pics[stim_out_set[2][blockstim_val[bl][1]]]);
+				outcomes_pic.set_part(   valnr[2],icecream_pics[stim_out_set[2][blockstim_val[bl][2]]]);
+				outcomes_pic.set_part( novalnr[1],icecream_pics[stim_out_set[2][blockstim_val[bl][3]]]);
+				outcomes_pic.set_part( novalnr[2],icecream_pics[stim_out_set[2][blockstim_val[bl][4]]]);
+#			else
+#				if     mod(bl,2)==1 then					# odd blocks
+#					outcomes_pic.set_part(  valnr[1],icecream_pics[stim_out_set[2][1]]);
+#					outcomes_pic.set_part(  valnr[2],icecream_pics[stim_out_set[2][2]]);
+#					outcomes_pic.set_part(novalnr[1],icecream_pics[stim_out_set[2][3]]);
+#					outcomes_pic.set_part(novalnr[2],icecream_pics[stim_out_set[2][4]]);
+#				elseif mod(bl,2)==0 then					# even blocks
+#					outcomes_pic.set_part(novalnr[1],icecream_pics[stim_out_set[2][5]]);
+#					outcomes_pic.set_part(novalnr[2],icecream_pics[stim_out_set[2][6]]);
+#					outcomes_pic.set_part(  valnr[1],icecream_pics[stim_out_set[2][7]]);
+#					outcomes_pic.set_part(  valnr[2],icecream_pics[stim_out_set[2][8]]);
+#				end;
+#			end;
+		end;
+	elseif trainORtest==2 then							# TEST
+		if demoORreal ==1 then 							# demo
+				outcomes_pic.set_part(  valnr[1],pizza_pics[test_val_set[bl][1][1]]);
+				outcomes_pic.set_part(  valnr[2],pizza_pics[test_val_set[bl][1][2]]);
+				outcomes_pic.set_part(novalnr[1],pizza_pics[test_val_set[bl][2][1]]);
+				outcomes_pic.set_part(novalnr[2],pizza_pics[test_val_set[bl][2][2]]);
+		elseif demoORreal ==0 then 					# real
+				outcomes_pic.set_part(  valnr[1],icecream_pics[test_val_set[bl][1][1]]);
+				outcomes_pic.set_part(  valnr[2],icecream_pics[test_val_set[bl][1][2]]);
+				outcomes_pic.set_part(novalnr[1],icecream_pics[test_val_set[bl][2][1]]);
+				outcomes_pic.set_part(novalnr[2],icecream_pics[test_val_set[bl][2][2]]);
+		end;
+	end;
+	
+	# Set the correct instruction text
+	if     demoORreal==1 then show_text.set_caption("Remember which pizzas you should (not) collect!");
+	elseif demoORreal==0 then show_text.set_caption("Remember which ice creams you should (not) collect!");
+	end;
+	show_text.redraw();
+
+	#######################################################
+	# Loop over seconds of presentation time and present
+	
+	loop s = 1 until s > val_dur begin;
+
+		# adjust counter per run through the loop = per second
+		countdown_text.set_caption(string((val_dur+1)-s));
+		countdown_text.redraw();
+		
+		# actual presentation of the outcomes screen
+		outcomesTrial.present();
+		s=s+1;
+	end;
+		
+	out_show.print(date_time()										+ "\t");	# Date and time 
+	out_show.print(string(demoORreal)							+ "\t");	# DemoReal:  1 = demo, 2 = real
+	out_show.print(string(trainORtest) 							+ "\t");	# TrainTest: 1 = training, 2 = test
+	out_show.print(string(bl)										+ "\t");	# Blocknr
+	
+	out_show.print(string(randnr) 								+ "\t");	# 1 = valuable outcomes left, 2 = valuable outcomes right
+	loop int p=1 until p>4 begin;												# picture presented in 1st/2nd val and 1st/2nd no val location
+			if trainORtest==1 then								# TRAINING
+				if     demoORreal==1 	then out_show.print(string(stim_out_set[2][p    ]) + "\t");	# demo
+				elseif demoORreal==0 then
+					if (task_part == 4) 	then out_show.print(string(stim_out_set[2][blockstim_val[bl][p]]) + "\t");
+					else
+						if mod(bl,2)==1 	then out_show.print(string(stim_out_set[2][p    ]) + "\t");	# training odd blocks blockstim_val[bl]
+						elseif mod(bl,2)==0 	then out_show.print(string(stim_out_set[2][p + 4]) + "\t");	# training even blocks			
+						end;
+					end;
+				end;
+			elseif trainORtest==2 && demoORreal==0 then							# TEST
+				if     p==1 then out_show.print(string(test_val_set[bl][1][1]) + "\t");	# test blocks
+				elseif p==2 then out_show.print(string(test_val_set[bl][1][2]) + "\t");
+				elseif p==3 then out_show.print(string(test_val_set[bl][2][1]) + "\t");
+				elseif p==4 then out_show.print(string(test_val_set[bl][2][2]) + "\n"); end;
+		end;
+		p=p+1;
+	end;
+	out_show.print("\n");
+	
+end;	# end sub
