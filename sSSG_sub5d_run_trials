@@ -12,11 +12,11 @@ sub run_trials begin;
 	# SET RELEVANT VARIABLES
 
 	# Set active buttons for this part: space bar only
-	response_manager.set_button_active(1,true);
-	response_manager.set_button_active(2,false);
-	response_manager.set_button_active(3,false);
-	response_manager.set_button_active(4,false);
-	response_manager.set_button_active(5,false);
+	response_manager.set_button_active(1,true);	#spacebar
+	response_manager.set_button_active(2,false);	#left mouse click
+	response_manager.set_button_active(3,false);	#backspace
+	response_manager.set_button_active(4,true);	#left arrow key
+	response_manager.set_button_active(5,true);	#right arrow key 
 
 	# Adjust size of vehicles	
 	van1.set_load_size(240.0,400.0,0); van1.load();
@@ -169,8 +169,14 @@ sub run_trials begin;
 		# 3. Check whether a response has been made		
 		get_resp_nr = response_manager.total_response_count();
 		
-		# If so, store relevant info
+		 # If so, store relevant info
 		if get_resp_nr > start_resp_nr then
+			int response_value = response_manager.last_response(); # get response LINE ADDED
+			if resp == 4 then  # Convert response value 4 to 1
+				resp = 1;
+			elseif resp == 5 then  # Convert response value 5 to 0
+				resp = 0;
+			end;
 			
 			# Determine RT
 			stimulus_data resp_time = stimulus_manager.last_stimulus_data();
@@ -182,18 +188,27 @@ sub run_trials begin;
 				RT_sce = 0;
 			end;
 			
-			# Adjust values
-			resp=1; late=0;
-			fb_stay=1;
-			if     curr_respreq == 1 then currpoints= 1; blockpoints=blockpoints+1; # correct
-			elseif curr_respreq == 0 then currpoints=-1; blockpoints=blockpoints-1; # incorrect							
+			# Set initial values
+			late = 0;
+			fb_stay = 1;
+
+			# Set score
+			if resp == curr_respreq then
+				 # correct
+				 currpoints = 1;
+				 blockpoints = blockpoints + 1;
+				 if demoORreal == 0 then
+						totalpoints = totalpoints + 1;
+				 end;
+			else
+				 # incorrect
+				 currpoints = -1;
+				 blockpoints = blockpoints - 1;
+				 if demoORreal == 0 then
+						totalpoints = totalpoints - 1;
+				 end;
 			end;
-			if demoORreal==0 then			# only points collected during real task are added to total
-				if     curr_respreq == 1 then totalpoints=totalpoints+1; # correct
-				elseif curr_respreq == 0 then totalpoints=totalpoints-1; # incorrect							
-				end;
-			end;
-		end;			
+		end;		
 
 		###############################################		
 		# 4. Present outcome or delay
