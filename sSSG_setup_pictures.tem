@@ -1,0 +1,326 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# PICTURE TEMPLATE												#
+#																		#
+#######################################################
+
+#######################################################
+# DEFINE PICTURE PARTS
+
+######################
+# Texts
+text { caption = "Instructions";									 transparent_color = 0,0,0;font_size = 18; } t_text;					# instruction screen
+text { caption = "Press the space bar to continue.";transparent_color = 0,0,0;font_size = 14; } press_text;
+			
+text { caption = "Enter: "; 																			font_size = 20; } keyboard_instr_text; # experimenter input
+text { caption = " "; 		 																			font_size = 30; } keyboard_input_text;
+
+#text { caption = "Tijdens dit spel ben je een skateboarder.";								font_size = 20; } skateboard_text1; 	# choose skateboarder input
+#text { caption = "Welke skateboarder wil je zijn? Kies 1 of 2 en druk enter.";		font_size = 20; } skateboard_text2;
+#text { caption = " "; 		 																			font_size = 20; } skateboard_input;
+
+text { caption = "The next block almost starts.";							font_size = 30; } block_text;
+
+text { caption = "Please wait, the task is almost starting...";							font_size = 30; } mri_start;
+
+text { caption = "Please remember which pizza's have to be collected!!"; 						font_size = 20; } show_text;				# show valuable outcomes
+text { caption = "_"; 												transparent_color = 0,0,0;	font_size = 48; } countdown_text;
+
+text { caption = "Let op: nu beginnen de wagens met de vruchten.";						font_size = 30; } start_text;
+
+text { caption = "Click on the pizza's you have to collect."; 							font_size = 20; } selection_text;		# check valuable outcomes
+
+# Intentions
+text { caption = "Als ik"; 																			font_size = 30; } intention_part1_text;# text implementation/goal intention
+text { caption = "zie, dan druk ik ";																font_size = 30; } intention_part2_text;
+text { caption = "WEL";		 											 								font_size = 30; } intention_part3_text;
+text { caption = "NIET";		 																		font_size = 30; } intention_part4_text;
+
+# Score screen
+text { caption = "0% correct";		 transparent_color = 255,255,255; font_color = 0,0,0; background_color = 255,255,255; font_size = 20; font = "arial bold";} points_text;		# score screen after block
+
+# Break screen
+text { caption = "BREAK"; 																				font_size = 24; } break_text;				# break
+text { caption = "00"; 																					font_size = 24; } break_count_text;
+text { caption = "Press the space bar to continue with the next block."; 	font_size = 20; } break_cont_text;
+
+# SO test
+text { caption = "Which ice cream was associated with this ice cream van?"; 								font_size = 20; } SO_text;					# SO test
+text { caption = "Hoe zeker ben je hiervan?"; 													font_size = 20; } conf_text;
+text { caption = "Heel onzeker                             Heel zeker"; 				font_size = 20; } bar_text;
+
+# SRBAI
+text { caption = "Which response is associated with this ice cream van?";								font_size = 18; } SRBAI_resp_text;
+text { caption = "Responding";																		font_size = 18; } SRBAI_press_text;
+text { caption = "NOT responding";																		font_size = 18; } SRBAI_nopress_text;
+text { caption = "Use the mouse:\n\n(Not) making this response..."; font_size = 18; } SRBAI_quest1_text;
+text { caption = "(Not) making this response was something I did automatically.";														   font_size = 18; } SRBAI_quest2a_text;
+text { caption = "... was iets wat ik deed zonder dat ik het bewust hoefde te onthouden.";			   font_size = 18; } SRBAI_quest2b_text;
+text { caption = "... was iets wat ik deed zonder erbij na te denken.";										   font_size = 18; } SRBAI_quest2c_text;
+text { caption = "... was iets wat ik begon te doen voordat ik er erg in had.";							   font_size = 18; } SRBAI_quest2d_text;
+text { caption = "Disagree                             Agree"; 										   font_size = 18; } SRBAI_bar_text;
+
+text { caption = " "; 																									    } blank;
+
+######################
+# Boxes and graphics
+box { height = 500; width = 400; color = 255,  0,  0;} box_red;				# show outcomes
+box { height = 500; width = 400; color =   0,255,  0;} box_green;
+box { height = 480; width = 380; color =   0,  0,  0;} box_red_center;
+box { height = 480; width = 380; color =   0,  0,  0;} box_green_center;
+
+box { height =  35; width =   7; color = 128,128,128;} box_cursor; 								# used on bar in confidence rating
+ellipse_graphic { ellipse_width = 20; ellipse_height = 20; color = 255,255,255;} cursor; 	# used for mouse
+annulus_graphic { outer_width = 220; outer_height = 220; inner_width = 210; inner_height = 210; color = 255,255,255;} mouse_sel; # selection in check outcomes (fruitpicker)
+
+box { height = 70; width = 120; color = 255,255,255;} box_white;									# selection in intentions (wel/niet)
+box { height = 50; width = 100; color =   0,  0,  0;} box_black;
+
+box { height = 500; width = 700; color = 255,230,153; } box_yellow_inside;
+box { height = 540; width = 740; color = 255,192,  0; } box_yellow_border;
+
+# SRBAI
+box { height = 70; width = 220; color = 255,255,255;} SRBAI_box_white;
+box { height = 50; width = 200; color =   0,  0,  0;} SRBAI_box_black;
+box { height = 30; width =   7; color = 128,128,128;} SRBAI_box_cursor;
+
+# SO
+# box { height = 200; width = 200; color = 255,255,255;} SO_box_white;
+line_graphic {
+   coordinates = -100, 100,  100, 100,  100, -100, -100, -100, -100, 100;
+   line_width = 10;
+} SO_box_white;
+
+line_graphic {
+   coordinates = -100, 100,  100, 100,  100, -100, -100, -100, -100, 100;
+	line_color = 32, 255, 64;
+   line_width = 10;
+} SO_box_green;
+
+
+######################
+# Bitmaps
+# pictures for instructions
+bitmap {		filename = "ss_skateboarder.jpg";	width = 1380; height = 775;				} bmp_ss_skateboarder;
+
+# pictures for instructions
+array {
+	bitmap { filename = "Slide1.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide2.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide3.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide4.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide5.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide6.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide7.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide8.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide9.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide10.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide11.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide12.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide13.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide14.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide15.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide16.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide17.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide18.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide19.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide20.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide21.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide22.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide23.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide24.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide25.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide26.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide27.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide28.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide29.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide30.jpeg";	width = 1280; height = 720;};	
+	bitmap { filename = "Slide31.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide32.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide33.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide34.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide35.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide36.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide37.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide38.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide39.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide40.jpeg";	width = 1280; height = 720;};	
+	bitmap { filename = "Slide41.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide42.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide43.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide44.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide45.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide46.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide47.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide48.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide49.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide50.jpeg";	width = 1280; height = 720;};	
+	bitmap { filename = "Slide51.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide52.jpeg";	width = 1280; height = 720;};
+	bitmap { filename = "Slide53.jpeg";	width = 1280; height = 720;}; bitmap { filename = "Slide54.jpeg";	width = 1280; height = 720;};	
+
+} instruction_pics;
+
+bitmap { 	filename = "Slide1.jpeg";				width = 1280; height = 720;				} instructions_fill;	
+
+#bitmap { 	filename = "Slide01a.jpeg";			width = 1280; height = 720;				} instructions_1a; # skateboarder
+#bitmap { 	filename = "Slide24a.jpeg";			width = 1280; height = 720;				} instructions_24a;
+
+bitmap { 	filename = "Slide9a.jpeg";			width = 1280; height = 720;				} instructions_9a; # instr screens that depend on green val-screen left/right
+bitmap { 	filename = "Slide10a.jpeg";			width = 1280; height = 720;				} instructions_10a;
+bitmap { 	filename = "Slide13a.jpeg";			width = 1280; height = 720;				} instructions_13a;
+bitmap { 	filename = "Slide20a.jpeg";			width = 1280; height = 720;				} instructions_20a;
+bitmap { 	filename = "Slide22a.jpeg";			width = 1280; height = 720;				} instructions_22a;
+
+
+bitmap { 	filename = "POS.png"; 					width =   90; height =  90;				} bmp_plus;
+bitmap { 	filename = "NEG.png"; 					width =   90; height =  90;				} bmp_minus;
+
+bitmap { 	filename = "background.jpg"; 			width = 1280; height = 720;				} bmp_background;
+bitmap { 	filename = "bckgrd_points_boy.jpg"; width = 1280; height = 720;				} bmp_points_boy;
+bitmap { 	filename = "bckgrd_points_girl.jpg";width = 1280; height = 720;				} bmp_points_girl;
+
+bitmap { 	filename = "van1.png";    				width =  300; height = 240; alpha = -1;} bmp_van_fill;
+bitmap { 	filename = "pizza1.png";  				width =  200; height = 200; alpha = -1;} bmp_out_fill;	
+
+bitmap { 	filename = "pizza_deliveryman.png"; width =  100; height = 200; alpha = -1;} bmp_pizzaman;
+bitmap { 	filename = "icecream_vendor.png";   width =  160; height = 200; alpha = -1;} bmp_icecreamman;
+
+array {
+	bitmap { filename = "scooter_pract1.png"; 	width =  300; height = 240; alpha = -1;} scooter1;
+	bitmap { filename = "scooter_pract2.png"; 	width =  300; height = 240; alpha = -1;} scooter2;
+	bitmap { filename = "scooter_pract3.png"; 	width =  300; height = 240; alpha = -1;} scooter3;
+	bitmap { filename = "scooter_pract4.png"; 	width =  300; height = 240; alpha = -1;} scooter4;
+} scooter_pract_pics;
+
+array {
+	bitmap { filename = "van1.png"; 					width =  400; height = 240; alpha = -1;} van1;
+	bitmap { filename = "van2.png"; 					width =  400; height = 240; alpha = -1;} van2;
+	bitmap { filename = "van3.png"; 					width =  400; height = 240; alpha = -1;} van3;
+	bitmap { filename = "van4.png"; 					width =  400; height = 240; alpha = -1;} van4;
+	bitmap { filename = "van5.png"; 					width =  400; height = 240; alpha = -1;} van5;
+	bitmap { filename = "van6.png"; 					width =  400; height = 240; alpha = -1;} van6;
+	bitmap { filename = "van7.png"; 					width =  400; height = 240; alpha = -1;} van7;
+	bitmap { filename = "van8.png"; 					width =  400; height = 240; alpha = -1;} van8;
+} van_pics;
+
+array {
+	bitmap { filename = "pizza1.png"; 				width =  250; height = 250; alpha = -1;} pizza1;
+	bitmap { filename = "pizza2.png"; 				width =  250; height = 250; alpha = -1;} pizza2;
+	bitmap { filename = "pizza3.png"; 				width =  310; height = 310; alpha = -1;} pizza3;
+	bitmap { filename = "pizza4.png"; 				width =  250; height = 250; alpha = -1;} pizza4;
+} pizza_pics;
+
+array {
+	bitmap { filename = "icecream1.png"; 			width =  220; height = 220; alpha = -1;} icecream1;
+	bitmap { filename = "icecream2.png"; 			width =  250; height = 250; alpha = -1;} icecream2; # Calippo needs to be a bit bigger
+	bitmap { filename = "icecream3.png"; 			width =  220; height = 220; alpha = -1;} icecream3;
+	bitmap { filename = "icecream4.png"; 			width =  200; height = 200; alpha = -1;} icecream4;
+} icecream_pics;
+
+bitmap { 	filename = "pizzabanner.png";    	width =  200; height = 200; alpha = -1;} bmp_pizzabanner;
+bitmap { 	filename = "icecreambanner.png"; 	width =  250; height = 250; alpha = -1;} bmp_icecreambanner;
+
+bitmap { 	filename = "colorbar.png";				width =  400; height =  25; alpha = -1;} bmp_colorbar;
+bitmap { 	filename = "colorbar_bw.png";			width =  300; height =  20; alpha = -1;} bmp_colorbar_bw;
+
+#######################################################
+# DEFINE PICTURES
+
+# MRI start
+
+picture {
+	text mri_start;	x =    0; y =    0;
+} mri_start_pic; 
+
+# Choice skateboarder
+#picture {
+#	bitmap bmp_ss_skateboarder;x =    0; y =    0;
+#	text skateboard_text1; 		x =    0; y =  200;
+#   text skateboard_text2; 		x =    0; y = -250;
+#   text skateboard_input; 		x =    0; y = -300;	
+#} skateboard_pic;
+
+# Instruction screens
+picture {
+	bitmap instructions_fill;	x =    0; y =    0;
+} intro_pic;
+
+# Keyboard input experimenter
+picture {
+   text keyboard_instr_text; 	x =    0; y =  100;
+   text keyboard_input_text; 	x =    0; y =    0;
+} keyboard_input_pic;
+
+# Start block
+picture {
+	text block_text;		x =    0; y = 0;
+} block_pic;
+
+# Presentation screen valuable outcomes
+picture {
+	box box_red;					x = -300; y =    0;
+	box box_red_center;			x = -300; y =    0;
+	bitmap bmp_minus;				x = -300; y = -245;
+	
+	box box_green;					x =  300; y =    0;
+	box box_green_center;		x =  300; y =    0;
+	bitmap bmp_plus;				x =  300; y = -245;
+	
+	bitmap bmp_out_fill;			x = -300; y =  120;
+	bitmap bmp_out_fill;			x = -300; y = -120;
+	bitmap bmp_out_fill;			x =  300; y =  120; 
+	bitmap bmp_out_fill;			x =  300; y = -120;
+	
+	text countdown_text;			x =    0; y =    0;
+	text show_text;				x =    0; y =  300;
+} outcomes_pic;
+
+# Presentation screen selection valuable outcomes
+picture {
+	bitmap bmp_out_fill;			x = -450; y =    0;
+	bitmap bmp_out_fill;			x = -150; y =    0;
+	bitmap bmp_out_fill;			x =  150; y =    0; 
+	bitmap bmp_out_fill;			x =  450; y =    0;
+	
+	text selection_text;			x =    0; y =  200;
+	ellipse_graphic cursor;		x =    0; y = -100;
+} selection_pic;
+
+# Presentation implementation/goal intentions
+picture {
+	text intention_part1_text;	x = -450; y =    0;
+	bitmap bmp_out_fill;			x = -200; y =    0;
+	text intention_part2_text;	x =  100; y =    0;
+#	text intention_part3_text;	x =  350; y =   50;
+#	text intention_part4_text;	x =  350; y =  -50;
+} intention_pic;
+
+# Start trials
+picture {
+	text start_text;		x =    0; y = 0;
+} start_pic;
+
+# ITI during training/test
+picture {
+	bitmap bmp_background;		x =    0; y =    0;
+} ITI_pic;
+
+# Trial scene
+picture {
+	bitmap bmp_background;		x =    0; y =    0;
+	bitmap bmp_van_fill;			x =   50; y = -100;
+	bitmap bmp_icecreamman;		x =    0; y = -125;
+	bitmap bmp_out_fill;			x =    0; y =  100;
+} trial_pic;
+
+# Present score after each block of training/test
+picture {
+	bitmap bmp_points_boy;		x =    0; y =    0;
+	text points_text;				x =  150; y =    0;
+} score_pic;
+
+# Break
+picture {
+	text break_text; 				x =    0; y =  150;
+	text break_count_text;		x =    0; y =    0;
+#	text break_cont_text;		x =    0; y = -250;
+} break_pic;
+
+# SO test (stimulus and cursor added in pcl script)
+picture {
+	text 	 SO_text;				x =-200; y = 	200;	
+	bitmap bmp_out_fill;			x =-450; y =     0;
+	bitmap bmp_out_fill;			x =-150; y =     0;
+	bitmap bmp_out_fill;			x = 150; y =     0; 
+	bitmap bmp_out_fill;			x = 450; y =     0;
+} SO_pic;
+
+# SRBAI
+picture {
+	bitmap bmp_van_fill;			x =-300; y =   200;
+	text	SRBAI_resp_text;		x = 300; y =   200;
+	text	SRBAI_press_text;		x = 200; y =   150;
+	text	SRBAI_nopress_text;	x = 400; y =   150;
+} SRBAI_pic;
+
+# Black screen
+picture {
+	text 	 blank;					x =   0; y = 	  0;	
+} blank_pic;
