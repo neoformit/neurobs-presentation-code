@@ -1,0 +1,52 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: present instruction texts					#
+#																		#
+#######################################################
+
+sub present_instructions begin;
+
+	#######################################################
+	# Set active buttons for this part: space bar and backspace
+	response_manager.set_button_active(1,true);
+	response_manager.set_button_active(2,false);
+	response_manager.set_button_active(3,true);
+	response_manager.set_button_active(4,false);
+	response_manager.set_button_active(4,false);
+	
+	#######################################################
+	# LOOP THROUGH SCREENS OF TEXT AND PRESENT THEM
+	#randnr=mod(int(stim_out_set[1][1]),2) + 1;		
+
+	loop int i = start_screen until i > end_screen begin;
+	
+		intro_pic.set_part(1,instruction_pics[i]);	# set correct screen
+
+		if 	 randnr == 2 then  # green screen rechts	
+			if i== 9 then intro_pic.set_part(1,instructions_9a);
+			elseif i==10 then intro_pic.set_part(1,instructions_10a);
+			elseif i==13 then intro_pic.set_part(1,instructions_13a);
+			elseif i==20 then intro_pic.set_part(1,instructions_20a);	
+			elseif i==22 then intro_pic.set_part(1,instructions_22a);	
+			end; 
+		end;
+
+		#if skateboarder==2 then 
+		#	if i== 1 then intro_pic.set_part(1,instructions_1a);
+		#	elseif i==24 then intro_pic.set_part(1,instructions_24a);
+		#	end;
+		#end;
+		
+
+		
+		introTrial.present();								# present screen
+
+		# correct response information
+		resp=response_manager.last_response();			# get response
+		if     resp==1        then i=i+1;				# space bar = next screen
+		elseif resp==3 && i>1 then i=i-1;				# backspace = previous screen, but not on first screen
+		end;
+	end;
+end;
