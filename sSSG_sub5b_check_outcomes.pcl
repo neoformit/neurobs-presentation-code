@@ -49,8 +49,8 @@ sub check_outcomes begin
 	resp2		 = 0;
 	curr_resp = 0;
 	
-	if     demoORreal==1 then selection_text.set_caption("Klik met de muis op de pizza's die je moet verzamelen.");
-	elseif demoORreal==0 then selection_text.set_caption("Klik met de muis op de ijsjes die je moet verzamelen.");
+	if     demoORreal==1 then selection_text.set_caption("Click the yummy pizzas you wanted to eat.");
+	elseif demoORreal==0 then selection_text.set_caption("Click the yummy ice creams you wanted to eat.");
 	end;
 	selection_text.redraw();
 
