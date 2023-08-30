@@ -1,0 +1,45 @@
+I just had a really quick look at the script. Contrary to what I thought, the response button is not specified in the SDL script. Rather, at the top of the separate scripts, it is determined which buttons are active and can be used in that (part of the) script. In the run_trials scripts this is:
+# Set active buttons for this part: space bar only
+response_manager.set_button_active(1,true);
+response_manager.set_button_active(2,false);
+response_manager.set_button_active(3,false);
+response_manager.set_button_active(4,false);
+response_manager.set_button_active(5,false);
+The numbers of the buttons correspond to their order in the Settings, so for the arrows you probably need 4 and 5 to be active.
+
+The main thing that needs to be adjusted is that in the run_trials file, these lines now check whether a response was given and if so, record the response info:
+# 3. Check whether a response has been made		
+		get_resp_nr = response_manager.total_response_count();
+		
+		# If so, store relevant info
+		if get_resp_nr > start_resp_nr then
+			
+			# Determine RT
+			stimulus_data resp_time = stimulus_manager.last_stimulus_data();
+			RT = resp_time.reaction_time();
+			response_data rd = response_manager.last_response_data();
+			if ( !is_null(rd) ) then
+				RT_sce = rd.time();
+			else
+				RT_sce = 0;
+			end;
+			
+			# Adjust values
+			resp=1; late=0; 	# will need to adjust to be left arrow, right arrow, no response (late)
+			fb_stay=1;
+			if     curr_respreq == 1 then currpoints= 1; blockpoints=blockpoints+1; # correct
+			elseif curr_respreq == 0 then currpoints=-1; blockpoints=blockpoints-1; # incorrect							
+		end;
+			if demoORreal==0 then			# only points collected during real task are added to total
+				if     curr_respreq == 1 then totalpoints=totalpoints+1; # correct
+				elseif curr_respreq == 0 then totalpoints=totalpoints-1; # incorrect							
+				end;
+			end;
+		end;			
+ 
+This should be adjusted such that it (also) checks which response was given and always record the relevant response info.
+You can use this line of code for that: 
+Int resp = response_manager.last_response(); # get response
+
+Also relevant is that the responses are currently recorded as 1 (response button 1 used, so the space bar) or 0 (no response given). If you use buttons 4 and 5, this means the script needs to be adjusted such that these button numbers are interpreted correctly, for example, when the correctness of the response is assessed. If you do not want to change all the matrices, the easiest adjustment probably would be once you know which response was given (4/5) just to add another line of code to convert those values to 1/0 so the rest of the script can stay the same.
+
