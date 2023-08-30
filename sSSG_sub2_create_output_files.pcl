@@ -1,0 +1,215 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: create new output files						#
+#																		#
+#######################################################
+
+##########################################################
+# 1. Create logfile for presentation of outcomes
+
+sub create_output_file_showoutcomes begin;
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_showoutcomes.txt";	# create name for new outputfile
+	out_show = new output_file;														# start new outputfile
+	out_show.open_append(tmp_fn);														# link outputfile to created filename
+
+	out_show.print("DateTime\t");														# Date and time
+	out_show.print("DemoReal\t");														# 1 = demo, 2 = real
+	out_show.print("TrainTest\t");													# 1 = training, 2 = test
+	out_show.print("Block\t");															# Block number
+
+	out_show.print("ValSide\t");														# valuable outcomes left or right
+	out_show.print("S_Pic1_V1\t");													# picture presented in first (most left) location
+	out_show.print("S_Pic2_V2\t");													# picture presented in second location
+	out_show.print("S_Pic3_N1\t");													# picture presented in third location
+	out_show.print("S_Pic4_N2\n");													# picture presented in fourth location
+end;
+
+##########################################################
+# 2. Create logfile for check of knowledge valuable outcomes (fruitpicker)
+
+sub create_output_file_checkoutcomes begin;
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_checkoutcomes.txt";	# create name for new outputfile
+	out_check = new output_file;														# start new outputfile
+	out_check.open_append(tmp_fn);													# link outputfile to created filename
+
+	out_check.print("DateTime\t");													# Date and time
+	out_check.print("DemoReal\t");													# 1 = demo, 2 = real
+	out_check.print("TrainTest\t");													# 1 = training, 2 = test
+	out_check.print("Block\t");														# Block number
+
+	out_check.print("C_Pic1\t");														# outcomes: picture presented in first (most left) location
+	out_check.print("C_Pic2\t");														# outcomes: picture presented in second location
+	out_check.print("C_Pic3\t");														# outcomes: picture presented in third location
+	out_check.print("C_Pic4\t");														# outcomes: picture presented in fourth location
+	
+	out_check.print("Corr1\t");														# outcomes: first correct response (should be given)
+	out_check.print("Corr2\t");														# outcomes: second correct response (should be given)
+	out_check.print("Resp1\t");														# outcomes: first response (actually given)
+	out_check.print("Resp2\t");														# outcomes: second response (actually given)
+	out_check.print("RT1\t");															# outcomes: first RT
+	out_check.print("RT2\n");															# outcomes: second RT
+end;
+
+##########################################################
+# 3. Create logfile for intentions
+
+sub create_output_file_intentions begin;
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_intentions.txt";		# create name for new outputfile
+	out_int = new output_file;															# start new outputfile
+	out_int.open_append(tmp_fn);														# link outputfile to created filename
+	
+	out_int.print("DateTime\t");														# Date and time
+	out_int.print("IIGI\t");															# 1 = implementation intentions, 2 = goal intentions
+	out_int.print("DemoReal\t");														# 1 = demo, 2 = real
+	out_int.print("TrainTest\t");														# 1 = training, 2 = test
+	out_int.print("Block\t");															# Block number
+
+	out_int.print("Pic\t");																# Picture
+	out_int.print("Outc\t");															# Outcome
+	out_int.print("Corr\t");															# Correct response
+	out_int.print("Resp\t");															# Given response
+	out_int.print("Acc\t");																# Acc
+	out_int.print("RT\n");																# RT
+end;
+
+##########################################################
+# 4. Create logfile with trial-to-trial information training
+
+sub create_output_file_train begin;	
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_train.txt";			# create name for new outputfile
+	out_train = new output_file;														# start new outputfile
+	out_train.open_append(tmp_fn);													# link outputfile to created filename
+
+	out_train.print("DateTime\t");													# Date and time
+	out_train.print("IIGI\t");															# 1 = implementation intentions, 2 = goal intentions	
+	out_train.print("DemoReal\t");													# 1 = demo, 2 = real
+	out_train.print("TrainTest\t");													# 1 = training; 2 = test
+	out_train.print("StartIntention\t");													# 1 = start II
+	out_train.print("ValScreen\t");													# 1 = start II
+	out_train.print("MRI\t");													# 0 = no; 1 = in MRI
+	out_train.print("Block\t");														# Block number
+
+	out_train.print("Trial\t");														# Trial number
+	out_train.print("TrainRespreq\t");												# Response required in training
+	out_train.print("TestRespreq\t");												# Response required in test
+	out_train.print("Trainingcond\t");												# Condition for training
+	
+	out_train.print("Setnr\t");														# Which set of pictures to use
+	out_train.print("Stimulus\t");													# Stimulus
+	out_train.print("Outcome\t");														# Outcome
+	out_train.print("Response\t");													# Response given or not
+	out_train.print("RT\t");															# Reaction time
+	out_train.print("RT_sce\t");															# Reaction time
+	out_train.print("FB\t");															# Present FB (outcome stays on screen) or not
+	out_train.print("Correct\t");														# Response or lack thereof correct or not
+	out_train.print("ITI_dur\t");														# ITI
+	out_train.print("t_trial_onset\t");												# stimulus onset time
+	out_train.print("Currpoints\t");													# Points gained/lost on this trial
+	out_train.print("Blockpoints\t");												# Points gained/lost in this block
+	out_train.print("Totalpoints\n");												# Points gained/lost in total
+end;
+
+##########################################################
+# 5. Create logfile with trial-to-trial information test
+
+sub create_output_file_test begin;	
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_test.txt";				# create name for new outputfile
+	out_test = new output_file;														# start new outputfile
+	out_test.open_append(tmp_fn);														# link outputfile to created filename
+
+	out_test.print("DateTime\t");														# Date and time
+	out_test.print("IIGI\t");															# 1 = implementation intentions, 2 = goal intentions
+	out_test.print("DemoReal\t");														# 1 = demo, 2 = real
+	out_test.print("TrainTest\t");													# 1 = training; 2 = test
+	out_test.print("StartIntention\t");													# 1 = start II
+	out_test.print("ValScreen\t");													# 1 = start II
+	out_test.print("MRI\t");													# 0 = no; 1 = in MRI
+	out_test.print("Block\t");															# Block number
+
+	out_test.print("Trial\t");															# Trial number
+	out_test.print("TrainRespreq\t");												# Response required in training
+	out_test.print("TestRespreq\t");													# Response required in test
+	out_test.print("Testcond\t");														# Condition for test
+	
+	out_test.print("Setnr\t");															# Which set of pictures to use
+	out_test.print("Stimulus\t");														# Stimulus
+	out_test.print("Outcome\t");														# Outcome
+	out_test.print("Response\t");														# Response given or not
+	out_test.print("RT\t");																# Reaction time
+	out_test.print("RT_sce\t");														# Reaction time
+	out_test.print("FB\t");																# Present FB (outcome stays on screen) or not
+	out_test.print("Correct\t");														# Response or lack thereof correct or not
+	out_test.print("ITI_dur\t");														# ITI
+	out_test.print("t_trial_onset\t");												# stimulus onset time
+	out_test.print("Currpoints\t");													# Points gained/lost on this trial
+	out_test.print("Blockpoints\t");													# Points gained/lost in this block
+	out_test.print("Totalpoints\n");													# Points gained/lost in total
+end;
+	
+##########################################################
+# 6. Create logfile with check of SO knowledge
+
+sub create_output_file_SOcheck begin;
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_SOtest.txt";			# create name for new outputfile
+	out_so = new output_file;															# start new outputfile
+	out_so.open_append(tmp_fn);														# link outputfile to created filename
+
+	out_so.print("DateTime\t");														# Date and time
+	out_so.print("Stim_tr\t");															# How manieth stimulus (trial)
+	
+	out_so.print("O_Pic1\t");															# Outcome presented in first (most left) location
+	out_so.print("O_Pic2\t");															# Outcome presented in second location
+	out_so.print("O_Pic3\t");															# Outcome presented in third location
+	out_so.print("O_Pic4_\t");															# Outcome presented in fourth location
+
+	out_so.print("Stimulus\t"); 														# Stimulus
+	out_so.print("Corr_resp\t");	 													# Correct response
+	out_so.print("Resp\t"); 															# Choice
+	out_so.print("RT\t"); 																# RT
+	out_so.print("Accuracy\t"); 														# Accuracy
+	
+	out_so.print("Confidence\t"); 													# Confidence
+	out_so.print("RT_confidence\n"); 												# RT of confidence judgement
+end;
+
+##########################################################
+# 7. Create logfile for SRBAI
+
+sub create_output_file_SRBAI begin;
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_SRBAI.txt";				# create name for new outputfile
+	out_srbai = new output_file;															# start new outputfile
+	out_srbai.open_append(tmp_fn);														# link outputfile to created filename
+
+	out_srbai.print("DateTime\t");														# Date and time
+	out_srbai.print("Stim_tr\t");															# How manieth stimulus (trial)
+	
+	out_srbai.print("Stimulus\t"); 														# Stimulus
+	out_srbai.print("Corr_resp\t");	 													# Correct response
+	out_srbai.print("Resp\t"); 															# Choice
+	out_srbai.print("RT\t"); 																# RT
+	out_srbai.print("Accuracy\t"); 														# Accuracy
+	
+	out_srbai.print("SRBAI_1\t");		 													# Automaticity
+	#out_srbai.print("SRBAI_2\t");
+	#out_srbai.print("SRBAI_3\t");
+	#out_srbai.print("SRBAI_4\t");
+
+	out_srbai.print("SRBAI_1_RT\t"); 													# RT of automaticity judgement
+	#out_srbai.print("SRBAI_2_RT\t");
+	#out_srbai.print("SRBAI_3_RT\t");
+	#out_srbai.print("SRBAI_4_RT\n");
+end;
+
+##########################################################
+# 7. Create logfile for triggers
+sub create_output_file_triggers begin;
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_triggers.txt";				# create name for new outputfile
+	out_triggers = new output_file;															# start new outputfile
+	out_triggers.open_append(tmp_fn);														# link outputfile to created filename
+	
+	out_triggers.print("Task_part\t");	
+	out_triggers.print("TrainTest\t");	
+	out_triggers.print("TriggerTime\n");	
+end;
