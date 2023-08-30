@@ -1,0 +1,174 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: present implementation/goal intentions	#
+#																		#
+#######################################################
+
+sub present_intentions begin
+	
+	#######################################################
+	# Set active buttons for this part: mouse click only
+	response_manager.set_button_active(1,false);
+	response_manager.set_button_active(2,false);
+	response_manager.set_button_active(3,false);
+	response_manager.set_button_active(4,false);
+	response_manager.set_button_active(5,false);
+
+	# Adjust size of vehicles	
+	van1.set_load_size(180.0,300.0,0); van1.load();
+	van2.set_load_size(180.0,300.0,0); van2.load();
+	van3.set_load_size(180.0,300.0,0); van3.load();
+	van4.set_load_size(180.0,300.0,0); van4.load();
+	van5.set_load_size(180.0,300.0,0); van5.load();
+	van6.set_load_size(180.0,300.0,0); van6.load();
+	van7.set_load_size(180.0,300.0,0); van7.load();
+	van8.set_load_size(180.0,300.0,0); van8.load();
+	
+	#######################################################
+	# Determine number of intentions and fill them
+	
+	nr_stim = nr_intentions_per_block;
+	nr_rep  = nr_intention_repetitions;
+	int total_nr_of_intentions=nr_stim*nr_rep;
+	array <int> intention_order[total_nr_of_intentions];
+	loop int m=1 until m>nr_rep begin;
+		loop int n=1 until n>nr_stim begin;
+			intention_order[m*nr_stim-nr_stim+n]=n;
+			n=n+1;
+		end;
+		m=m+1;
+	end;
+	
+	# Make sure there are no direct repetitions in the intentions
+	loop bool c=false until c==true begin;
+		loop int set=1 until set>nr_rep begin;
+			intention_order.shuffle(set*nr_stim-nr_stim+1,set*nr_stim);
+			set=set+1;
+		end;
+		loop int i=2 until i>total_nr_of_intentions begin;
+			if intention_order[i]==intention_order[i-1] then break; end;
+			if i==total_nr_of_intentions then c=true; end;
+			i=i+1;
+		end;
+	end;
+	
+ 	#######################################################
+	# Loop over intentions
+	
+	loop int i=1 until i>total_nr_of_intentions begin;
+	
+		#######################################################
+		# Present blank sceen
+		
+		blankTrial.set_duration(500);
+		blankTrial.present();
+	
+		#######################################################
+		# Settings for intentions
+			
+		# Duration
+		#intentionTrial.set_type(first_response);
+		#intentionTrial.set_duration(intention_dur);
+		#intentionEvent.set_response_active(false);
+		
+		# Select stimulus, outcome, and value
+		curr_stim	   = stim_out_set[1][set_nr+intention_order[i]];
+		curr_outcome   = stim_out_set[2][set_nr+intention_order[i]];
+		resp_corr	   = stim_out_set[3][set_nr+intention_order[i]];
+
+		# Set correct text and picture
+		if iiORgi==1 then
+			intention_part1_text.set_caption("Als ik"); 				intention_part1_text.redraw();
+			intention_part2_text.set_caption("zie, dan druk ik"); intention_part2_text.redraw();
+			if     demoORreal==1 then intention_pic.set_part(2,scooter_pract_pics[curr_stim]);
+			elseif demoORreal==0 then intention_pic.set_part(2,          van_pics[curr_stim]);
+			end;
+		elseif iiORgi==2 then
+			intention_part1_text.set_caption("Voor"); 				intention_part1_text.redraw();
+			intention_part2_text.set_caption("druk ik"); 			intention_part2_text.redraw();
+			if     demoORreal==1 then intention_pic.set_part(2,   pizza_pics[curr_outcome]);
+			elseif demoORreal==0 then intention_pic.set_part(2,icecream_pics[curr_outcome]);
+			end;
+		end;
+				
+		#######################################################
+		# Run intentions
+		
+		# Reset counters and text
+		start_resp_nr = response_manager.total_response_count();
+		start_time	  = clock.time();
+		curr_time	  = 0;
+		RT				  = 0;
+		resp			  = 0;
+
+		
+		# only present correct intention
+		if (resp_corr==1) then
+			intention_pic.add_part(intention_part3_text, 310, 0);
+		else
+			intention_pic.add_part(intention_part4_text, 310, 0);	
+		end;
+
+		# Present the trial
+#		intentionTrial.present();
+#		get_resp_nr = response_manager.total_response_count();
+		
+			# Keep presenting selection until the end of the intention window
+			intentionTrial.set_type(fixed);
+			intentionTrial.set_duration(intention_dur);
+			intentionEvent.set_response_active(false);
+			intentionTrial.present();
+
+			default.present();
+			wait_interval(500);
+			
+			
+/* NO RESPONSE
+		# Register response if given
+		if get_resp_nr > start_resp_nr then
+			curr_time	= clock.time();
+			RT				= curr_time-start_time;
+			resp			= response_manager.last_response()-3;
+			
+			# Present box around chosen answer
+			if     resp==1 then 
+				intention_pic.insert_part(6,box_white,350,50);
+				intention_pic.insert_part(7,box_black,350,50);
+				intention_pic.insert_part(8,intention_part3_text,350,50);
+			elseif resp==2 then
+				intention_pic.insert_part(6,box_white,350,-50);
+				intention_pic.insert_part(7,box_black,350,-50);
+				intention_pic.insert_part(8,intention_part4_text,350,-50);
+			end;
+			
+
+			# Remove box
+			intention_pic.remove_part(8);
+			intention_pic.remove_part(7);
+			intention_pic.remove_part(6);		
+		end;
+*/
+		
+		#######################################################
+		# Write output
+		
+		out_int.print(date_time()												+ "\t");	# Date and time
+		out_int.print(string(iiORgi)											+ "\t");	# IIGI: 1 = ii, 2 = gi
+		out_int.print(string(demoORreal)										+ "\t");	# DemoReal:  1 = demo, 2 = real
+		out_int.print(string(trainORtest) 									+ "\t");	# TrainTest: 1 = training, 2 = test
+		out_int.print(string(bl)												+ "\t");	# Blocknr
+
+		out_int.print(string(curr_stim) 										+ "\t"); # Picture
+		out_int.print(string(curr_outcome) 									+ "\t"); # Outcome
+		out_int.print(string(resp_corr) 										+ "\t");	# Correct response (1/2)
+		out_int.print(string(resp) 											+ "\t");	# Given response (1/2)
+		out_int.print(string(1-abs(resp_corr-resp))						+ "\t"); # Acc (1/0)
+		out_int.print(string(RT)												+ "\n"); # RT
+		
+		i=i+1;
+		
+	end;
+	
+end;	# end sub
