@@ -1,0 +1,296 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: test explicit S-O knowledge					#
+#																		#
+#######################################################
+
+# RANDOMIZE STIM ORDER TO AVOID HAVING 2X THE SAME OUTCOME SEQUENCE
+
+sub SO_test begin;
+
+	####################################################
+	# PREPARE VARIABLES AND SETTINGS
+	
+	# Resize stimuli and outcomes
+	van1.set_load_size(120,180,0); van1.load();
+	van2.set_load_size(120,180,0); van2.load();
+	van3.set_load_size(120,180,0); van3.load();
+	van4.set_load_size(120,180,0); van4.load();
+	van5.set_load_size(120,180,0); van5.load();
+	van6.set_load_size(120,180,0); van6.load();
+	van7.set_load_size(120,180,0); van7.load();
+	van8.set_load_size(120,180,0); van8.load();
+	
+	icecream1.set_load_size(150,150,0); icecream1.load();
+	icecream2.set_load_size(180,180,0); icecream2.load();
+	icecream3.set_load_size(150,150,0); icecream3.load();
+	icecream4.set_load_size(150,150,0); icecream4.load();
+
+	# mouse_sel.set_dimensions(160,160,170,170); mouse_sel.redraw();
+	
+	# Set active buttons for this part: mouse click only
+	response_manager.set_button_active(1,true);
+	response_manager.set_button_active(2,false);
+	response_manager.set_button_active(3,false);
+	response_manager.set_button_active(4,true);
+	response_manager.set_button_active(5,true);
+	
+	# Select stimulus-outcome matrix
+	stim_out_set.assign(real_stim_out_set);
+	
+	# Set location on screen of different outcomes for selection
+	loc_out.shuffle();
+
+	# Put outcomes in correct location
+	SO_pic.set_part(2,icecream_pics[loc_out[1]]);
+	SO_pic.set_part(3,icecream_pics[loc_out[2]]);
+	SO_pic.set_part(4,icecream_pics[loc_out[3]]);
+	SO_pic.set_part(5,icecream_pics[loc_out[4]]);
+
+	# Randomize order in which vans are presented
+	array <int> randstim[8]={1,2,3,4,5,6,7,8};
+	randstim.shuffle();
+	
+	####################################################
+	# LOOP OVER STIMULUS PICTURES (ICECREAM VANS)
+	
+	loop s=1 until s>nr_stim_per_block_train*2 begin;
+
+		#######################################################
+		# 1. ITI: SO pic without icecream van
+		SOTrial.set_duration(500);
+		SOEvent.set_response_active(false);
+		SOTrial.present();
+		
+		#######################################################
+		# Set stimulus (van) to present, add cursor, make response active, make mouse unrestricted
+		SO_pic.insert_part(6,van_pics[stim_out_set[1][randstim[s]]],250,200);
+		SO_pic.insert_part(7,SO_box_white,0,0);
+		
+		#mouse1.set_restricted(1,false); # this version is still implemented in the lab (March 29)
+		
+		#mouse1.set_restricted(1,true); # this is the version that should be implemented
+		#mouse1.set_min_max(1,-600,600);
+		#mouse1.set_min_max(2,-250,60);
+		
+		SOEvent.set_response_active(true);
+		SOTrial.set_duration(1);
+
+		# Determine which response is correct
+		correct.resize(1);
+		if loc_out[1]==stim_out_set[2][randstim[s]] then correct[1]=1; end;
+		if loc_out[2]==stim_out_set[2][randstim[s]] then correct[1]=2; end;
+		if loc_out[3]==stim_out_set[2][randstim[s]] then correct[1]=3; end;
+		if loc_out[4]==stim_out_set[2][randstim[s]] then correct[1]=4; end;
+			
+		# Reset counters and text
+		start_resp_nr=response_manager.total_response_count();
+		start_time=clock.time();
+		resp				= 0;
+		int acc			= 0;
+		int confidence	= 0;
+		int RT_conf		= 0;
+		int RESP       = 9999;
+		int x          = 0;
+		
+		#######################################################
+		# 2. PRESENT OUTCOME CHOICE
+		
+		start_resp_nr=response_manager.total_response_count();
+		loop 
+#			bool moving_left = false;
+#			bool moving_right = false;
+			bool complete = false;
+		until complete==true begin;	
+
+
+			# Present cursor at the current mouse location
+			# mouse1.poll();
+			
+			SO_pic.set_part_x(7,x);
+			SO_pic.set_part_y(7,0);
+
+			# Present the trial
+			# SOTrial.present();
+			SO_pic.present();
+			
+			get_resp_nr = response_manager.total_response_count();
+			
+			# Check whether a response was made, if so:
+			if get_resp_nr > start_resp_nr then
+				
+				curr_time=clock.time();
+				RT=curr_time-start_time;
+				
+				if (response_manager.last_response() == 1 && !(x==0)) then		# button nr 1 = SPACE  %% om toe te voegen dat de eerste response met spatie niet werkt, volgens mij iets als  && resp > 0) toevoegen hier, en iets veranderen met resp. 
+					RESP = 1+(x+450)/300; 
+					resp = RESP;
+					complete=true;
+				elseif (response_manager.last_response() == 4) then		# button nr 6 = <
+					if (x==0) then x=-150; else x=x-300;	end;
+					if (x<-450) then x=-450; end;
+				elseif (response_manager.last_response() == 5) then		# button nr 8 = >
+					if (x==0) then x=150; else x=x+300; end;	
+					if (x>450) then x=450; end;
+				end;
+				start_resp_nr = response_manager.total_response_count();
+				
+				
+				# Present circle around selected stimulus
+				if resp>0 then 
+					
+					# Determine whether response was correct
+					if resp==correct[1] then acc=1; end;
+				
+					# Add circle around selected icecream
+					SO_pic.insert_part(8,SO_box_white,x,0); 
+					
+					complete=true;
+				end;
+
+			end; # end response check loop
+		end; # end complete loop
+
+		#######################################################
+		/*
+		# 3. PRESENT CONFIDENCE RATING
+		
+		# Add visuals for confidence rating to screen
+		SO_pic.remove_part(7); 								# remove cursor
+		SO_pic.insert_part(8,conf_text,-250,-180);	# add text
+		SO_pic.insert_part(9,bar_text,200,-180);		# add text
+		SO_pic.insert_part(10,bmp_colorbar,200,-250);# add colorbar
+		SO_pic.insert_part(11,box_cursor,200,-250);	# add straight cursor
+				
+		# Restrict mouse range to width of colorbar
+		mouse1.set_restricted(1,true);
+		mouse1.set_min_max(1,0,400);
+		mouse1.set_pos(1,0);
+		
+		# Reset response-related settings
+		start_resp_nr=response_manager.total_response_count();
+		start_time=clock.time();
+
+			loop
+				double step = 1;
+				bool moving_left = false;
+				bool moving_right = false;
+				bool complete=false;
+				RESP = 9999;
+				x=200;
+			until complete
+			begin
+				if ( response_manager.total_response_count() > start_resp_nr ) then
+					if (response_manager.last_response() == 1) then		# button nr 1 = SPACE
+						RESP = x; 
+						RT_conf = clock.time() - start_time;
+						confidence = x;
+						complete=true;
+						#term.print_line("SPACE");
+					elseif (moving_right) then
+						moving_right=false;
+						step=1;
+					elseif (moving_left) then
+						moving_left=false;
+						step=1;
+					elseif (response_manager.last_response() == 4) then		# button nr 6 = <
+						moving_left=true;
+					elseif (response_manager.last_response() == 5) then		# button nr 8 = >
+						moving_right=true;
+					end;
+					start_resp_nr = response_manager.total_response_count();
+				end;
+				
+				if (moving_right) then
+					x=int(x+step);
+					step=step+0.1;
+					if (x > 400) then x=400; end
+				end;	
+
+				if (moving_left) then
+					x=int(x-step);
+					step=step+0.1;
+					if (x < 0) then x=0; end
+				end;	
+						
+				if ( RESP == 9999 ) then 
+					SO_pic.set_part_x(11,x); # version presentation in lab: mouse1.x()
+					#SO_pic.set_part_x(SO_pic.part_count(),x); # version presentation in lab: mouse1.x()
+					#SRBAI_pic.set_part_x(10+(q*3), x ); 
+					#SRBAI_pic.set_part_x( SRBAI_pic.part_count(), x ); 
+				end;
+				
+				SO_pic.present();
+			end;
+			
+
+			wait_interval(250);
+*/
+			
+/*
+		loop bool complete=false until complete==true begin;	
+
+			# Present cursor at the current mouse location
+			mouse1.poll();
+			SO_pic.set_part_x(11,mouse1.x()); # version presentation in lab: mouse1.x()
+
+			# Present the trial
+			SOTrial.present();
+			get_resp_nr = response_manager.total_response_count();
+			
+			# Check whether a response was made, if so:
+			if get_resp_nr > start_resp_nr then
+				
+				curr_time=clock.time();
+				mouse1.poll(); # Get current location of the mouse (= response click location)
+				confidence=mouse1.x();
+				RT_conf=curr_time-start_time;
+				
+				# Keep presenting selection for 200 ms
+				SOEvent.set_response_active(false);
+				SOTrial.set_duration(200);
+				SOTrial.present();
+					
+				complete=true;
+			end;
+				
+		end; # end complete loop
+*/	
+			
+		#######################################################
+		# 	WRITE TO OUTPUT FILE
+		
+		out_so.print(date_time()							+ "\t");	# Date and time
+		out_so.print(string(s)								+ "\t"); # How manieth stimulus trial
+
+		out_so.print(string(loc_out[1]) 					+ "\t"); # Outcome at position 1
+		out_so.print(string(loc_out[2]) 					+ "\t"); # Outcome at position 2
+		out_so.print(string(loc_out[3]) 					+ "\t");	# Outcome at position 3
+		out_so.print(string(loc_out[4]) 					+ "\t"); # Outcome at position 4
+
+		out_so.print(string(stim_out_set[1][randstim[s]])		+ "\t"); # Stimulus
+		out_so.print(string(correct[1])					+ "\t"); # Correct response
+		out_so.print(string(resp)							+ "\t"); # Choice
+		out_so.print(string(RT)								+ "\t"); # RT
+		out_so.print(string(acc)							+ "\n"); # Accuracy
+		
+		#out_so.print(string(confidence)					+ "\t"); # Confidence
+		#out_so.print(string(RT_conf)						+ "\n"); # RT of confidence judgement
+
+		#######################################################
+		# CLEAR SCREEN
+		
+		#SO_pic.remove_part(11);
+		#SO_pic.remove_part(10);
+		#SO_pic.remove_part(9);		
+		SO_pic.remove_part(8);
+		SO_pic.remove_part(7);
+		SO_pic.remove_part(6);
+		
+		s=s+1;
+		
+	end;	# end selected loop
+
+end;
