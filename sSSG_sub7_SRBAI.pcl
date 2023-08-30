@@ -1,0 +1,241 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: SRBAI												#
+#																		#
+#######################################################
+
+sub SRBAI begin;
+
+	####################################################
+	# PREPARE VARIABLES AND SETTINGS
+	
+	# Resize stimuli (vans)
+	van1.set_load_size(160,240,0); van1.load();
+	van2.set_load_size(160,240,0); van2.load();
+	van3.set_load_size(160,240,0); van3.load();
+	van4.set_load_size(160,240,0); van4.load();
+	van5.set_load_size(160,240,0); van5.load();
+	van6.set_load_size(160,240,0); van6.load();
+	van7.set_load_size(160,240,0); van7.load();
+	van8.set_load_size(160,240,0); van8.load();
+		
+	# Set active buttons for this part: mouse click only
+	response_manager.set_button_active(1,false);
+	response_manager.set_button_active(2,true);
+	response_manager.set_button_active(3,false);
+	response_manager.set_button_active(4,false);
+	response_manager.set_button_active(5,false);
+	
+	# Select stimulus-outcome matrix
+	stim_out_set.assign(real_stim_out_set);
+	
+	# Randomize order in which vans are presented
+	array <int> randstim[8]={1,2,3,4,5,6,7,8};
+	randstim.shuffle();
+	
+	####################################################
+	# LOOP OVER STIMULUS PICTURES (ICECREAM VANS)
+	
+	# Loop over stimuli (vans)
+	loop s=1 until s>nr_stim_per_block_train*2 begin;
+
+		#######################################################
+		# 1. ITI: blank screen
+		
+		blankTrial.set_duration(500);
+		blankEvent.set_response_active(false);
+		blankTrial.present();
+		
+		#######################################################
+		# 2. PRESENT RESPONSE CHOICE
+		
+		# Select stimulus to present, make response active, make mouse unrestricted		
+		SRBAI_pic.set_part(1,van_pics[stim_out_set[1][randstim[s]]]);
+		SRBAI_pic.insert_part(5,cursor,0,0);
+		
+		#mouse1.set_restricted(1,false); # this is still the version in the lab (29 March)
+		
+		mouse1.set_restricted(1,true); # adjustment to implement
+		mouse1.set_min_max(1,100,500);
+		mouse1.set_min_max(2,100,200);
+		
+		SRBAITrial.set_duration(1); # continuously looped until a respons is made
+
+		# Determine which response is correct
+		correct.resize(1);
+		correct[1]=stim_out_set[3][randstim[s]];
+			
+		# Reset counters
+		start_resp_nr  = response_manager.total_response_count();
+		start_time     = clock.time();
+		int acc			= 0;
+		resp				= 0;
+		RT					= 0;
+		
+		# Loop choice screen until a response is made
+		loop bool complete=false until complete==true begin;	
+
+			start_resp_nr  = response_manager.total_response_count();
+
+			# Present cursor at the current mouse location
+			mouse1.poll();
+			SRBAI_pic.set_part_x(5,mouse1.x());
+			SRBAI_pic.set_part_y(5,mouse1.y());
+
+			# Present the trial
+			SRBAITrial.present();
+			get_resp_nr = response_manager.total_response_count();
+			
+			# Check whether a response was made, if so:
+			if get_resp_nr > start_resp_nr then
+				
+				curr_time = clock.time();
+				RT        = curr_time-start_time;
+				mouse1.poll(); # Get current location of the mouse (= response click location)
+				
+				# Determine whether a stimulus was selected, and if so, which one
+				if mouse1.y() > 100 && mouse1.y() < 200 then
+					if     mouse1.x() > 100 && mouse1.x() <= 300 then resp=1; new_pic_part_x=200;
+					elseif mouse1.x() > 300 && mouse1.x() <= 500 then resp=2; new_pic_part_x=400;
+					end;
+				end;
+				
+				# Present box around selected stimulus
+				if resp>0 then 
+					
+					# Determine whether response was correct
+					if resp==(2-correct[1]) then acc=1; end;
+				
+					# Add rectangle around selected response (box with text presented on top of it)
+					SRBAI_pic.insert_part(6,SRBAI_box_white,new_pic_part_x,150);
+					SRBAI_pic.insert_part(7,SRBAI_box_black,new_pic_part_x,150);
+					SRBAI_pic.insert_part(8,SRBAI_press_text,200,150);
+					SRBAI_pic.insert_part(9,SRBAI_nopress_text,400,150);
+					
+					complete=true;
+				end;
+				
+			end; # end response check loop
+		end; # end complete loop
+
+
+		#######################################################
+		# 3. PRESENT SRBAI QUESTIONS
+
+		# Add visuals for SRBAI questions
+		SRBAI_pic.remove_part(5);										# remove cursor
+		#SRBAI_pic.insert_part(9,SRBAI_quest1_text,-200,-10); 	# add starttext SRBAI questions
+		SRBAI_pic.insert_part(9,SRBAI_bar_text,400,-30); 		# add text above colorbar
+		
+		SRBAI_quest1_text.set_align(align_left);  
+		SRBAI_quest1_text.redraw();
+
+		array <int> srbai_score[1];
+		array <int> srbai_rt[1];
+		
+		int q=1;
+			# Add question, colorbar and cursor on colorbar, only after response next one is added
+			SRBAI_pic.insert_part(10,SRBAI_quest2a_text,	-200, -100); # add question
+			SRBAI_pic.insert_part(11,bmp_colorbar_bw, 		 400, -100); # add colorbar
+			SRBAI_pic.insert_part(12,box_cursor,		  		 400, -100); # add cursor on colorbar
+			
+/*	4 question version:
+	loop int q=1 until q>4 begin;
+				
+			# Add question, colorbar and cursor on colorbar, only after response next one is added
+			if     q==1 then SRBAI_pic.insert_part(11,SRBAI_quest2a_text,	-350, -100); # add question
+								  SRBAI_pic.insert_part(12,bmp_colorbar_bw, 		 400, -100); # add colorbar
+								  SRBAI_pic.insert_part(13,box_cursor,		  		 400, -100); # add cursor on colorbar
+			elseif q==2 then SRBAI_pic.insert_part(14,SRBAI_quest2b_text,	-168, -150);
+								  SRBAI_pic.insert_part(15,bmp_colorbar_bw, 		 400, -150);
+								  SRBAI_pic.insert_part(16,box_cursor,		  		 400, -150);
+			elseif q==3 then SRBAI_pic.insert_part(17,SRBAI_quest2c_text,	-278, -200);
+								  SRBAI_pic.insert_part(18,bmp_colorbar_bw, 		 400, -200);
+								  SRBAI_pic.insert_part(19,box_cursor,		  		 400, -200);
+			elseif q==4 then SRBAI_pic.insert_part(20,SRBAI_quest2d_text,	-241, -250);
+								  SRBAI_pic.insert_part(21,bmp_colorbar_bw, 		 400, -250);
+								  SRBAI_pic.insert_part(22,box_cursor,		  		 400, -250);
+			end;
+			*/
+			# Restrict mouse range to width of colorbar
+			mouse1.set_restricted(1,true);
+			mouse1.set_min_max(1,250,550);
+			mouse1.set_pos(1,400);
+			
+			# Reset response-related settings
+			start_resp_nr = response_manager.total_response_count();
+			start_time    = clock.time();
+
+			# Present continuously until response is made
+			loop bool complete=false until complete==true begin;	
+
+				# Present cursor at the current mouse location within colorbar
+				mouse1.poll();
+#				SRBAI_pic.set_part_x(10+(q*3),mouse1.x());
+				SRBAI_pic.set_part_x(9+(q*3),mouse1.x());
+
+				# Present the trial
+				SRBAITrial.present();
+				get_resp_nr = response_manager.total_response_count();
+				
+				# Check whether a response was made, if so:
+				if get_resp_nr > start_resp_nr then
+					
+					curr_time      = clock.time();
+					mouse1.poll(); 							# Get current location of the mouse (= response click location)
+					srbai_score[q] = mouse1.x();			# x-coordinate on bar = response
+					srbai_rt[q]    = curr_time-start_time;
+					
+					# Keep presenting selection for 200 ms
+					SRBAIEvent.set_response_active(false);
+					SRBAITrial.set_duration(200);
+					SRBAITrial.present();
+						
+					complete=true;
+				end;
+					
+			end; # end complete loop		
+	
+#			q=q+1;
+
+#		end; # end SRBAI question loop
+
+		#######################################################
+		# 	WRITE TO OUTPUT FILE
+	
+		out_srbai.print(date_time()							+ "\t");	# Date and time
+		out_srbai.print(string(s)								+ "\t"); # How manieth stimulus trial
+
+		out_srbai.print(string(stim_out_set[1][s])		+ "\t"); # Stimulus
+		out_srbai.print(string(correct[1])					+ "\t"); # Correct response
+		out_srbai.print(string(resp)							+ "\t"); # Choice
+		out_srbai.print(string(RT)								+ "\t"); # RT
+		out_srbai.print(string(acc)							+ "\t"); # Accuracy
+		
+		out_srbai.print(string((srbai_score[1]-250)/3)	+ "\t"); # Automaticity
+		#out_srbai.print(string((srbai_score[2]-250)/3)	+ "\t");
+		#out_srbai.print(string((srbai_score[3]-250)/3)	+ "\t");
+		#out_srbai.print(string((srbai_score[4]-250)/3)	+ "\t");
+
+		out_srbai.print(string(srbai_rt[1])					+ "\n"); # RT of automaticity judgement
+		#out_srbai.print(string(srbai_rt[2])					+ "\t");
+		#out_srbai.print(string(srbai_rt[3])					+ "\t");
+		#out_srbai.print(string(srbai_rt[4])					+ "\n");
+
+		#######################################################
+		# CLEAR SCREEN
+		
+#		loop int r=1 until r>18 begin;
+#			SRBAI_pic.remove_part(23-r);
+#			r=r+1;
+#		end;
+		loop int r=1 until r>8 begin;
+			SRBAI_pic.remove_part(13-r);
+			r=r+1;
+		end;		
+		s=s+1;
+		
+	end;	# end selected loop
+end;	# end subroutine
