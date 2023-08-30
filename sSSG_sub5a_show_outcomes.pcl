@@ -82,8 +82,8 @@ sub show_outcomes begin
 	end;
 	
 	# Set the correct instruction text
-	if     demoORreal==1 then show_text.set_caption("Remember which pizzas you should (not) collect!");
-	elseif demoORreal==0 then show_text.set_caption("Remember which ice creams you should (not) collect!");
+	if     demoORreal==1 then show_text.set_caption("Remember which arrow key to press for each pizza!");
+	elseif demoORreal==0 then show_text.set_caption("Remember which arrow key to press for each ice cream!");
 	end;
 	show_text.redraw();
 
