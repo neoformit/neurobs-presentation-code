@@ -1,0 +1,138 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: check knowledge valuable outcomes			#
+#				  ('fruitpicker')									#
+#																		#
+#######################################################
+
+sub check_outcomes begin
+	
+	#######################################################
+	# Set active buttons for this part: mouse click only
+	response_manager.set_button_active(1,false);
+	response_manager.set_button_active(2,true);
+	response_manager.set_button_active(3,false);
+	response_manager.set_button_active(4,false);
+	response_manager.set_button_active(5,false);
+
+	#######################################################
+	# Put the outcomes in the correct location
+	loop int l=1 until l>4 begin;
+		if     demoORreal==1 						then selection_pic.set_part(l,   pizza_pics[stim_out_set[2][set_nr+loc_out[l]]]); # demo
+		elseif demoORreal==0 && trainORtest==1 then selection_pic.set_part(l,icecream_pics[stim_out_set[2][set_nr+loc_out[l]]]); # training
+		elseif demoORreal==0 && trainORtest==2 then selection_pic.set_part(l,icecream_pics[loc_out[l]]);								 # test
+		end;
+		l=l+1;
+	end;
+	
+	# Determine which responses are correct
+	int cc=1;
+	if     trainORtest==1 then	
+		if stim_out_set[3][set_nr+loc_out[1]]==1 then correct[cc]=1; cc=cc+1; end;
+		if stim_out_set[3][set_nr+loc_out[2]]==1 then correct[cc]=2; cc=cc+1; end;
+		if stim_out_set[3][set_nr+loc_out[3]]==1 then correct[cc]=3; cc=cc+1; end;
+		if stim_out_set[3][set_nr+loc_out[4]]==1 then correct[cc]=4; cc=cc+1; end;
+	elseif trainORtest==2 then		
+		if loc_out[1]==test_val_set[bl][1][1] || loc_out[1]==test_val_set[bl][1][2] then correct[cc]=1; cc=cc+1; end; 
+		if loc_out[2]==test_val_set[bl][1][1] || loc_out[2]==test_val_set[bl][1][2] then correct[cc]=2; cc=cc+1; end; 
+		if loc_out[3]==test_val_set[bl][1][1] || loc_out[3]==test_val_set[bl][1][2] then correct[cc]=3; cc=cc+1; end; 
+		if loc_out[4]==test_val_set[bl][1][1] || loc_out[4]==test_val_set[bl][1][2] then correct[cc]=4; cc=cc+1; end; 
+	end;
+		
+	# Reset counters and text
+	start_resp_nr = response_manager.total_response_count();
+	start_time	  = clock.time();
+	
+	resp1 	 = 0;
+	resp2		 = 0;
+	curr_resp = 0;
+	
+	if     demoORreal==1 then selection_text.set_caption("Klik met de muis op de pizza's die je moet verzamelen.");
+	elseif demoORreal==0 then selection_text.set_caption("Klik met de muis op de ijsjes die je moet verzamelen.");
+	end;
+	selection_text.redraw();
+
+	#######################################################
+	# Present the trial continuously until 2 responses are collected
+	loop bool complete=false until complete==true begin;	
+
+		# Present cursor at the current mouse location
+		mouse1.poll();
+		selection_pic.set_part_x(6,mouse1.x()); # version presentation in lab: mouse1.x()
+		selection_pic.set_part_y(6,mouse1.y()); # version presentation in lab: mouse1.y()
+
+		# Present the trial
+		selectionTrial.set_duration(1); # reset duration because it is changed at the end of the script
+		selectionTrial.present();
+		get_resp_nr = response_manager.total_response_count();
+		
+		# Check whether a response was made, if so:
+		if get_resp_nr > start_resp_nr then
+			
+			curr_time=clock.time();
+			
+			# Get current location of the mouse (= response click location)
+			mouse1.poll();
+			
+			# Determine whether a stimulus was selected, and if so, which one
+			if mouse1.y() > -100 && mouse1.y() < 100 then
+				if     mouse1.x() > -600 && mouse1.x() <= -300 then curr_resp=1; new_pic_part_x=-450;
+				elseif mouse1.x() > -300 && mouse1.x() <=    0 then curr_resp=2; new_pic_part_x=-150;
+				elseif mouse1.x() >    0 && mouse1.x() <=  300 then curr_resp=3; new_pic_part_x= 150;
+				elseif mouse1.x() >  300 && mouse1.x() <=  600 then curr_resp=4; new_pic_part_x= 450;
+				end;
+			end;
+			
+			# If a stimulus was indeed selected:
+			if mouse1.x() > -600 && mouse1.x() < 600  && mouse1.y() > -100 && mouse1.y() < 100 then
+				# Store response, determine which circle to add
+				if     resp1==0 then resp1=curr_resp; resp_time1=curr_time-start_time; new_pic_part=7;
+				elseif resp1 >0 then resp2=curr_resp; resp_time2=curr_time-start_time; new_pic_part=8; end;
+				
+				# Present circle around selected stimulus
+				selection_pic.insert_part(new_pic_part,mouse_sel,new_pic_part_x,0);
+			end;
+			
+			start_resp_nr = get_resp_nr;
+			start_time    = curr_time;
+		end;
+		
+		# Check whether 2 responses have been made
+		if resp1 > 0 && resp2 > 0 then
+			
+			# Keep presenting selection for 500 ms
+			selectionEvent.set_response_active(false);
+			selectionTrial.set_duration(500);
+			selectionTrial.present();
+			
+			complete=true;
+		end;
+	
+	end; # end complete loop
+	
+	selection_pic.remove_part(7); selection_pic.remove_part(7);
+
+	#######################################################
+	# Write output
+	
+	out_check.print(date_time()												+ "\t");	# Date and time 
+	out_check.print(string(demoORreal)										+ "\t");	# DemoReal:  1 = demo, 2 = real
+	out_check.print(string(trainORtest) 									+ "\t");	# TrainTest: 1 = training, 2 = test
+	out_check.print(string(bl)													+ "\t");	# Blocknr
+	
+	loop int p=1 until p>4 begin;															# Picture presented in 1st/2nd/3rd/4th location
+		if     trainORtest==1 then out_check.print(string(stim_out_set[2][set_nr+loc_out[p]]) 	+ "\t"); 
+		elseif trainORtest==2 then out_check.print(string(loc_out[p]) 								 	+ "\t");
+		end;
+		p=p+1;
+	end;
+	out_check.print(string(correct[1])										+ "\t");	# First correct response (should be given)
+	out_check.print(string(correct[2])										+ "\t");	# Second correct response (should be given)
+	out_check.print(string(resp1)												+ "\t");	# First response (actually given)
+	out_check.print(string(resp2)												+ "\t");	# Second response (actually given)
+	out_check.print(string(resp_time1)										+ "\t");	# First RT
+	out_check.print(string(resp_time2)										+ "\n");	# Second RT (starting from 1st response)
+	
+end;	# end sub
