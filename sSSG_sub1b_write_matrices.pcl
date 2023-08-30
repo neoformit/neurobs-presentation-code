@@ -1,0 +1,96 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE:  store and read stimout and testval		#
+#					matrices											#
+#																		#
+#######################################################
+
+#######################################################
+# Save combinations of stimuli and outcomes for possible restart
+
+sub create_stimout_file begin;
+
+	# Create file
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_stimout.txt";
+	out_stimout = new output_file;											
+	out_stimout.open_append(tmp_fn);											
+
+	# Store stim_out_set matrix
+	loop int p=1 until p>8 begin;
+		loop int r=1 until r>3 begin;
+			out_stimout.print(string(real_stim_out_set[r][p]) + "\t");
+			r=r+1;
+		end;
+		out_stimout.print("\n");
+		p=p+1;
+	end;
+
+	out_stimout.close();
+end;
+
+sub create_testval_file begin;
+
+	# Create file
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_testval.txt";
+	out_testval = new output_file;											
+	out_testval.open_append(tmp_fn);											
+
+	# Store stim_out_set matrix
+	loop int u=1 until u>nr_blocks_test*2 begin;
+		loop int v=1 until v>2 begin;
+			loop int w=1 until w>2 begin;
+				out_testval.print(string(real_test_val_set[u][v][w]) + "\t");
+				w=w+1;
+			end;
+			v=v+1;
+		end;
+		out_testval.print("\n");
+		u=u+1;
+	end;
+
+	out_testval.close();
+end;
+
+#######################################################
+# Load combinations of stimuli and outcomes for possible restart
+
+sub read_stimout_file begin;
+
+	# Load file
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_stimout.txt";
+	in_stimout = new input_file;
+	in_stimout.open(tmp_fn);
+
+	# Store stim_out_set matrix
+	loop int p=1 until p>8 begin;
+		loop int r=1 until r>3 begin;
+			real_stim_out_set[r][p]=in_stimout.get_int();
+			r=r+1;
+		end;
+		p=p+1;
+	end;
+	in_stimout.close();
+end;
+
+sub read_testval_file begin;
+
+	# Load file
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_testval.txt";
+	in_testval = new input_file;
+	in_testval.open(tmp_fn);
+
+	# Store stim_out_set matrix
+	loop int u=1 until u>nr_blocks_test begin;
+		loop int v=1 until v>2 begin;
+			loop int w=1 until w>2 begin;
+				real_test_val_set[u][v][w]=in_testval.get_int();
+				w=w+1;
+			end;
+			v=v+1;
+		end;
+		u=u+1;
+	end;
+	in_testval.close();
+end;
