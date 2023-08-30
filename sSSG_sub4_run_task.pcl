@@ -1,0 +1,241 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: run task											#
+#																		#
+#######################################################
+
+	#loop until (pulse_manager.main_pulse_count() == 1)
+   #begin
+   #end;
+sub run_task begin
+
+	if mri==1 then
+		mri_start_pic.present();
+		int current_pulse = pulse_manager.main_pulse_count();
+		loop until (pulse_manager.main_pulse_count() > current_pulse ) # here you can also add pulses, if it should e.g only start after current puls + 5 or so
+		begin
+		end;
+		int first_trigger = clock.time();
+		out_triggers.print(string(task_part) 	  + "\t");
+		out_triggers.print(string(trainORtest)   + "\t");
+		out_triggers.print(string(first_trigger) + "\n");
+	end;	
+	
+# Select the right matrices to use for trial order
+	if trainORtest==0 then
+		blocktrials = blocktrials_train_pavl;				# number of trials
+		trial_order.assign(trial_order_training_pavl);	# which trials are presented
+	elseif trainORtest==1 then
+		blocktrials = blocktrials_train;				# number of trials
+		trial_order.assign(trial_order_training);	# which trials are presented
+	elseif trainORtest==2 then
+		blocktrials = blocktrials_test;				
+		trial_order.assign(trial_order_test);		
+	end;
+	
+	if     demoORreal==1 then 
+		stim_out_set.assign(demo_stim_out_set); 	# which stimulus-outcome-value combinations are used
+		test_val_set.assign(demo_test_val_set); 	# which stimuli and outcomes are combined in the test blocks
+	elseif demoORreal==0 then 
+		stim_out_set.assign(real_stim_out_set);
+		test_val_set.assign(real_test_val_set);
+	end;
+		
+	# Set background, adjust size	
+	ITI_pic.set_part(1,bmp_background);
+	trial_pic.set_part(1,bmp_background);
+	bmp_background.set_load_size(screen_height,screen_width,0); 
+	bmp_background.load();
+	
+	###############################################
+	# START LOOP OVER BLOCKS
+	#if !(start_block==nr_blocks_train_int_mri/2 + 1) then start_block=1; #for second run mri-run continue where left
+	#end;
+		
+	if !(test_run == 2) then start_block=1; #for second run of test, continue counting (i.e. blocks 3 and 4)
+	end;
+	
+	#current_iti = 1;
+	
+	loop bl=start_block until bl > end_block begin;
+	
+		# Determine which stimulus set to use
+		#if trainORtest==1 then
+		#	if 	 mod(bl,2)==1 then set_nr=0; # odd block
+		#	elseif mod(bl,2)==0 then set_nr=4; # even block
+		#	end;
+		#else set_nr=0;
+		#end;
+	
+		blockTrial.present();
+
+/*		###############################################
+		###############################################
+		# 1 SHOW AND CHECK OUTCOMES
+		
+		# Set side of valuable/non-valuable outcomes during showing
+
+		# Set location of different outcomes for selection
+		loc_out.shuffle();	
+		
+		# Run until the participant correctly selects both valuable outcomes
+		loop bool selected=false until selected==true begin;	
+			
+			##########################
+			show_outcomes();
+			##########################
+
+			##########################
+			check_outcomes();
+			##########################
+
+			# Check whether the correct valuable outcomes were selected
+			if     resp1==correct[1] && resp2==correct[2] then selected=true;
+			elseif resp1==correct[2] && resp2==correct[1] then selected=true;
+			end;
+		end;
+*/
+
+		###############################################
+		###############################################
+		# 1 SHOW OUTCOMES AND PRESENT IMPLEMENTATION/GOAL INTENTIONS
+		
+#		randnr=mod(int(stim_out_set[1][1]),2) + 1;
+		
+		##########################
+		#if ( !(task_part==12 || task_part==14) ) then # don't present outcomes in the second part of the training with intentions phase (MRI part)
+		#	show_outcomes();
+		#end;
+
+		if !(no_val_screen==1) then no_val_screen=0;
+		show_outcomes();
+		end;
+		##########################
+
+		##########################
+		/*
+		if add_intentions==1 then 
+			if 	 start_intention==1 && mod(bl,2)==1 then iiORgi=1; # alternate, start with II
+			elseif start_intention==1 && mod(bl,2)==0 then iiORgi=2;
+			elseif start_intention==2 && mod(bl,2)==1 then iiORgi=2; # alternate, start with GI
+			elseif start_intention==2 && mod(bl,2)==0 then iiORgi=1;
+			end;		
+			present_intentions(); 
+		end;
+		*/
+		##########################
+
+		###############################################
+		###############################################
+		# 2 RUN TRIALS IN THIS BLOCK
+				
+		# Shuffle trial order
+		if     trainORtest==0 then nr_stim=nr_stim_per_block_train_pavl; nr_rep=nr_stim_rep_train_pavl;
+		elseif trainORtest==1 then nr_stim=nr_stim_per_block_train; nr_rep=nr_stim_rep_train;
+		elseif trainORtest==2 then nr_stim=nr_stim_per_block_test;  nr_rep=nr_stim_rep_test;
+		end;
+	
+		loop bool c=false until c==true begin;
+		
+			# Shuffle per 2 sets of all stim, currently per 8
+			loop int set=1 until set>nr_rep begin;
+				trial_order.shuffle(set*nr_stim-nr_stim+1,(set+1)*nr_stim);
+				set=set+2;
+			end;
+
+			# Check whether there are no direct repetitions, otherwise shuffle again
+			loop int i=2 until i>blocktrials begin;
+				if trial_order[i]==trial_order[i-1] then break; end;
+				if i==blocktrials then c=true; end;
+				i=i+1;
+			end;
+		end;
+
+		# If practice test, then only include 16 (rather than 32) trials
+		if demoORreal==1 && trainORtest==2 then blocktrials = 16; end;
+
+		#############
+		if runtrials==1 then
+			if 	 demoORreal==1 then start_text.set_caption("Attention: the scooters with pizzas are about to start.");
+			elseif demoORreal==0 then start_text.set_caption("Attention: the vans with ice creams are about to start.");
+			end;
+			start_text.redraw();
+			startTrial.present(); # Announce start of trials
+			run_trials(); 
+		end;
+		#############
+
+		###############################################
+		###############################################
+		# 3 PRESENT POINTS GAINED DURING THIS BLOCK
+		if     demoORreal==1 then
+			points_text.set_caption(string(double(press_corr)/(blocktrials/2)*100)  + "% correct response for pizzas\n\n you should COLLECT.\n\n\n" + 
+											string(double(inhib_corr)/(blocktrials/2)*100) + "% correct response for pizzas\n\n you should NOT COLLECT.\n\n\n" +
+											string(press_late) + " late response(s).\n\n\n" + 
+											"No points are rewarded in this practice block.");			
+		elseif demoORreal==0 then 
+			if 	 trainORtest==1 then
+			points_text.set_caption(string(double(press_corr)/(blocktrials/2)*100) + "% correct response for ice creams\n\n you should COLLECT.\n\n\n" + 
+											string(double(inhib_corr)/(blocktrials/2)*100) + "% correct response for ice creams\n\n you should NOT COLLECT.\n\n\n" +
+											string(press_late) + " late response(s).\n\n\n" + 
+											"You now have " + string(totalpoints) + " points in total!");			
+		
+			elseif trainORtest==2 then
+			points_text.set_caption("The task will continue shortly")
+			#								string(press_late) + " late response(s).\n\n\n");
+			end; 
+
+		end;
+		
+		points_text.redraw();
+		scoreTrial.set_duration(score_dur);
+		if runtrials==1 && trainORtest>0 then scoreTrial.present(); end;  # present outcome screens, except when in Pavl training (when trainORtest=0)
+		
+
+		###############################################
+		###############################################
+		# 4 WHEN RELEVANT, PRESENT BREAK
+
+		if mod(bl,break_blocks)==0 && end_block-bl>1 then 				# check whether a break should be presented		
+
+			# Set active buttons for this part: space bar only
+			response_manager.set_button_active(1,false);
+			response_manager.set_button_active(2,false);
+			response_manager.set_button_active(3,false);
+			response_manager.set_button_active(4,false);
+			response_manager.set_button_active(5,false);
+
+			resp						= response_manager.total_response_count();
+			start_time				= clock.time();
+			int real_break_dur	= br_dur*1000;
+				
+			loop int br=1 until br > br_dur begin;
+			
+				# Present break
+				break_count_text.set_caption(string(br_dur+1-br));
+				break_count_text.redraw();
+				breakTrial.present();
+				
+				# If a response has been made, stop break
+				resp1			= response_manager.total_response_count();
+				curr_time	= clock.time();
+				if resp1 > resp then
+					real_break_dur = curr_time - start_time;
+					break;
+				end;
+				
+				br=br+1;
+			end;				
+		
+			# Save duration of break
+			out_info.print("Break block " + string(bl) + ", duration " + string(real_break_dur) + "\n");
+		end;
+
+		###############################################
+		
+		bl=bl+1;
+		
+	end; # end block loop
+end;
