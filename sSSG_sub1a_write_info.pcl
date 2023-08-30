@@ -1,0 +1,88 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE:  create info file with general settings #
+# 					and schema's of stimuli and outcomes	#
+#																		#
+#######################################################
+
+sub create_info_file begin;
+
+	# Create file
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_info.txt";			# create name for new outputfile
+	out_info = new output_file;													# start new outputfile
+	out_info.open_append(tmp_fn);													# link outputfile to created filename
+
+	# Write settings to file
+	out_info.print("Settings:\n");
+	out_info.print("val_dur"   					+ "\t" + string(val_dur)   					+ "\n");
+	out_info.print("ITImin"   						+ "\t" + string(ITImin)							+ "\n");
+	out_info.print("ITImax"   						+ "\t" + string(ITImax)							+ "\n");
+	out_info.print("mov_dur"   					+ "\t" + string(mov_dur)   					+ "\n");
+	out_info.print("delay_dur" 					+ "\t" + string(delay_dur) 					+ "\n");
+	out_info.print("fb_dur" 	 					+ "\t" + string(fb_dur)    					+ "\n");
+	out_info.print("ITImin_test"   				+ "\t" + string(ITImin_test)					+ "\n");
+	out_info.print("ITImax_test"   				+ "\t" + string(ITImax_test)					+ "\n");
+	out_info.print("mov_dur_test1"   			+ "\t" + string(mov_dur_test1)   				+ "\n");
+	out_info.print("mov_dur_test2"   			+ "\t" + string(mov_dur_test2)   				+ "\n");
+#	out_info.print("delay_dur_test" 				+ "\t" + string(delay_dur_test) 				+ "\n"); #banner is presented, so unneccesary (just there to log late resp)
+	out_info.print("fb_dur_test" 	 				+ "\t" + string(fb_dur_test)    				+ "\n");
+	out_info.print("score_dur" 					+ "\t" + string(score_dur) 					+ "\n");
+	out_info.print("br_dur" 	 					+ "\t" + string(br_dur) 						+ "\n");
+
+	out_info.print("demo_nr_blocks_train"		+ "\t" + string(demo_nr_blocks_train) 		+ "\n"); 
+	out_info.print("demo_nr_blocks_test"		+ "\t" + string(demo_nr_blocks_test) 		+ "\n");
+	out_info.print("nr_blocks_train"				+ "\t" + string(nr_blocks_train)				+ "\n");
+	out_info.print("nr_blocks_test"				+ "\t" + string(nr_blocks_test)				+ "\n");
+	out_info.print("nr_stim_per_block_train"	+ "\t" + string(nr_stim_per_block_train)	+ "\n");
+	out_info.print("nr_stim_rep_train"			+ "\t" + string(nr_stim_rep_train)			+ "\n");	
+	out_info.print("nr_stim_per_block_test"	+ "\t" + string(nr_stim_per_block_test)	+ "\n");
+	out_info.print("nr_stim_rep_test"			+ "\t" + string(nr_stim_rep_test)			+ "\n");	
+	
+	out_info.print("break_blocks"					+ "\t" + string(break_blocks)					+ "\n");
+#	out_info.print("condition"						+ "\t" + string(iiORgi)							+ "\n");
+#	out_info.print("nr_intentions_per_block"	+ "\t" + string(nr_intentions_per_block)	+ "\n");
+#	out_info.print("nr_intention_repetitions" + "\t" + string(nr_intention_repetitions)	+ "\n");
+#	out_info.print("intention_dur" 				+ "\t" + string(intention_dur)				+ "\n");
+#	out_info.print("int_box_dur"    				+ "\t" + string(int_box_dur)					+ "\n");
+	out_info.print("randnr"							+ "\t" + string(randnr)							+ "\n");
+	
+	out_info.print("\nDemo stimulus-outcome-set schema\n");
+	loop int p=1 until p>8 begin;
+		if     p==1 then out_info.print("stim\toutcome\trespreq\n"); end;
+		loop int r=1 until r>3 begin;
+			out_info.print(string(demo_stim_out_set[r][p]) + "\t");
+			r=r+1;
+		end;
+		out_info.print("\n");
+		p=p+1;
+	end;
+
+	out_info.print("\nReal stimulus-outcome-set schema\n");
+	loop int p=1 until p>8 begin;
+		if     p==1 then out_info.print("stim\toutcome\trespreq\n"); end;
+		loop int r=1 until r>3 begin;
+			out_info.print(string(real_stim_out_set[r][p]) + "\t");
+			r=r+1;
+		end;
+		out_info.print("\n");
+		p=p+1;
+	end;
+
+	out_info.print("\nTest-usedstimuli-valuableoutcomes-set schema\n");
+	out_info.print("\tValstim1\tValout1\tValstim2\tValout2\tNonvalstim1\tNonvalout1\tNonvalstim2\tNonvalout2\n");
+	loop int u=1 until u>nr_blocks_test begin;
+		out_info.print("Test_block_" + string(u) + "\t");
+		loop int v=1 until v>2 begin;
+			loop int w=1 until w>2 begin;
+				out_info.print(string(real_test_val_set[u][v][w]) + "\t");
+				w=w+1;
+			end;
+			v=v+1;
+		end;
+		out_info.print("\n");
+		u=u+1;
+	end;
+
+end;
