@@ -25,12 +25,12 @@ text { caption = "The next block almost starts.";							font_size = 30; } block_
 
 text { caption = "Please wait, the task is almost starting...";							font_size = 30; } mri_start;
 
-text { caption = "Please remember which pizza's have to be collected!!"; 						font_size = 20; } show_text;				# show valuable outcomes
+text { caption = "Please remember whether pizza's are yummy or make you feel sick!!"; 						font_size = 20; } show_text;				# show valuable outcomes
 text { caption = "_"; 												transparent_color = 0,0,0;	font_size = 48; } countdown_text;
 
 text { caption = "Let op: nu beginnen de wagens met de vruchten.";						font_size = 30; } start_text;
 
-text { caption = "Click on the pizza's you have to collect."; 							font_size = 20; } selection_text;		# check valuable outcomes
+text { caption = "Click on the pizza's that were yummy."; 							font_size = 20; } selection_text;		# check valuable outcomes
 
 # Intentions
 text { caption = "Als ik"; 																			font_size = 30; } intention_part1_text;# text implementation/goal intention
@@ -52,9 +52,9 @@ text { caption = "Hoe zeker ben je hiervan?"; 													font_size = 20; } con
 text { caption = "Heel onzeker                             Heel zeker"; 				font_size = 20; } bar_text;
 
 # SRBAI
-text { caption = "Which response is associated with this ice cream van?";								font_size = 18; } SRBAI_resp_text;
-text { caption = "Responding";																		font_size = 18; } SRBAI_press_text;
-text { caption = "NOT responding";																		font_size = 18; } SRBAI_nopress_text;
+text { caption = "Did you press the left or right arrow key when you saw this ice cream van?";								font_size = 18; } SRBAI_resp_text;
+text { caption = "Left";																		font_size = 18; } SRBAI_press_text;
+text { caption = "Right";																		font_size = 18; } SRBAI_nopress_text;
 text { caption = "Use the mouse:\n\n(Not) making this response..."; font_size = 18; } SRBAI_quest1_text;
 text { caption = "(Not) making this response was something I did automatically.";														   font_size = 18; } SRBAI_quest2a_text;
 text { caption = "... was iets wat ik deed zonder dat ik het bewust hoefde te onthouden.";			   font_size = 18; } SRBAI_quest2b_text;
