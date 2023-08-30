@@ -171,14 +171,14 @@ sub run_task begin
 		###############################################
 		# 3 PRESENT POINTS GAINED DURING THIS BLOCK
 		if     demoORreal==1 then
-			points_text.set_caption(string(double(press_corr)/(blocktrials/2)*100)  + "% correct response for pizzas\n\n you should COLLECT.\n\n\n" + 
-											string(double(inhib_corr)/(blocktrials/2)*100) + "% correct response for pizzas\n\n you should NOT COLLECT.\n\n\n" +
+			points_text.set_caption(string(double(press_corr)/(blocktrials/2)*100)  + "% correct response for collecting yummy pizzas.\n\n\n" + 
+											string(double(inhib_corr)/(blocktrials/2)*100) + "% correct response for binning pizzas\n\n ythat made you feel sick.\n\n\n" +
 											string(press_late) + " late response(s).\n\n\n" + 
 											"No points are rewarded in this practice block.");			
 		elseif demoORreal==0 then 
 			if 	 trainORtest==1 then
-			points_text.set_caption(string(double(press_corr)/(blocktrials/2)*100) + "% correct response for ice creams\n\n you should COLLECT.\n\n\n" + 
-											string(double(inhib_corr)/(blocktrials/2)*100) + "% correct response for ice creams\n\n you should NOT COLLECT.\n\n\n" +
+			points_text.set_caption(string(double(press_corr)/(blocktrials/2)*100) + "% correct response for collecting yummy ice creams\n\n you should COLLECT.\n\n\n" + 
+											string(double(inhib_corr)/(blocktrials/2)*100) + "% correct response for binning ice creams\n\n that made you feel sick.\n\n\n" +
 											string(press_late) + " late response(s).\n\n\n" + 
 											"You now have " + string(totalpoints) + " points in total!");			
 		
