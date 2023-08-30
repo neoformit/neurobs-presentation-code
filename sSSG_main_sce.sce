@@ -21,7 +21,7 @@
 
 # SDL Header
 active_buttons 			 = 5;
-button_codes 				 = 1,2,3,4,5;		# 1=spacebar, 2=left mouse button, 3=backspace, 4=right alt, 5=right control 
+button_codes 				 = 1,2,3,4,5;		# 1=spacebar, 2=left mouse button, 3=backspace, 4=right arrow, 5=right arrow 
 # In scanner: 1=b (blue: most left button buttonbox), 2=left mouse button, 3=backspace, 4=y (yellow: left middle button buttonbox), 5=g (green: right middle button buttonbox)													
 
 # FMRI			
@@ -209,8 +209,8 @@ int trainORtest;		# 1 = train, 2 = test
 int iiORgi;				# 1 = ii,    2 = gi
 int no_val_screen;
 int mri;
-int start_intention; # 1== start ii, 2=start gi
-int skateboarder;
+int start_intention; # 1== start ii, 2=start gi	
+int skateboarder;	
 int randnr;
 int test_run;
 
@@ -237,9 +237,9 @@ int no_outcome_screen;
 int start_screen;
 int end_screen;
 
-array <int> loc_out[4]={1,2,3,4};
-int nr_stim;
-int nr_rep;
+array <int> loc_out[4]={1,2,3,4};	#associating the order of stimuli (logo/vans) with specific outcomes/responses I think?
+int nr_stim;	#number of stimuli (vans/logos)
+int nr_rep;	#number of trials
 
 int blocktrials;
 array <int> trial_order[1];
