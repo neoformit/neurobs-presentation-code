@@ -1,21 +1,21 @@
 ##########################################################
-#																			                   #
-# static Sneaky Skateboard Game IIGI training				     #
-#																			                   #
-# MAIN SCENARIO														               #
-# ___________________________________________________ 	 #
-#																			                   #
-# January 2018; adjusted 03/2020								         #
-# Adjustments by Tim van Timmeren & Irene van de Vijver  #
-#																			                   #
-# Implementation vs goal intentions in training phase		 #
-# fMRI experiment												                 # 
-# ___________________________________________________ 	 #
-#																			                   #
-# Irene van de Vijver												             #
-# University of Amsterdam											           #
-# irenevandevijver@gmail.com									           #
-#																			                   #
+#																			#
+# static Sneaky Skateboard Game IIGI training				#
+#																			#
+# MAIN SCENARIO														#
+# ___________________________________________________ 	#
+#																			#
+# January 2018; adjusted 03/2020									#
+# Adjustments by Tim van Timmeren & Irene van de Vijver 	#
+#																			#
+# Implementation vs goal intentions in training phase		#
+# fMRI experiment												      # 
+# ___________________________________________________ 	#
+#																			#
+# Irene van de Vijver												#
+# University of Amsterdam											#
+# irenevandevijver@gmail.com										#
+#																			#
 ##########################################################
 
 
