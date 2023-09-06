@@ -62,14 +62,14 @@ sub run_trials begin;
 		if     trainORtest==1 then test_respreq=999;	# 1 = training (don't need to determine value for training)
 		elseif trainORtest==2 then	# 2 = test phase
 			if     curr_outcome==test_val_set[bl][1][1] || curr_outcome==test_val_set[bl][1][2] then test_respreq=1;	# should be valuable/yummy, left arrow (preivously spacebar)
-			elseif curr_outcome==test_val_set[bl][2][1] || curr_outcome==test_val_set[bl][2][2] then test_respreq=0;	# should be nonvaluable/bin, right arrow (previously no responses)
+			elseif curr_outcome==test_val_set[bl][2][1] || curr_outcome==test_val_set[bl][2][2] then test_respreq=5;	# should be nonvaluable/bin, right arrow (previously no responses)
 			end;
 		
 			# determine condition depending on value of the outcome in training and test
 			if     train_respreq==1 && test_respreq==1 then testcond=1; # still valuable
-			elseif train_respreq==1 && test_respreq==0 then testcond=2; # devalued
-			elseif train_respreq==0 && test_respreq==1 then testcond=3; # upvalued
-			elseif train_respreq==0 && test_respreq==0 then testcond=4; # still not valuable
+			elseif train_respreq==1 && test_respreq==5 then testcond=2; # devalued
+			elseif train_respreq==5 && test_respreq==1 then testcond=3; # upvalued
+			elseif train_respreq==5 && test_respreq==5 then testcond=4; # still not valuable
 			end;
 		end;
 		
@@ -193,7 +193,7 @@ sub run_trials begin;
 			fb_stay = 1;
 
 			# Set score
-			if resp == curr_respreq then
+			if curr_respreq == rd.button() then
 				 # correct
 				 currpoints = 1;
 				 blockpoints = blockpoints + 1;
@@ -283,7 +283,7 @@ sub run_trials begin;
 		if late==0 then	# not late (valid response)
 			if 	 resp==curr_respreq then resp_corr=1;		# note: late responses are also considered as responses, so count towards the total that is displayed as feedback 
 				if     resp==1 then press_corr=press_corr+1;	# nr of correct responses/non-responses to report to pp
-				elseif resp==0 then inhib_corr=inhib_corr+1;	# press_corr and inhib_corr are 
+				elseif resp==5 then inhib_corr=inhib_corr+1;	# press_corr and inhib_corr are 
 				end;
 			elseif resp!=curr_respreq then resp_corr=0;
 			end;
