@@ -1,0 +1,356 @@
+#######################################################
+#																		#
+# static Sneaky Skateboard Game - IIGI						#
+#																		#
+# SUBROUTINE: run trials in block							#
+#																		#
+#######################################################
+
+sub run_trials begin;
+	
+	###############################################
+	# SET RELEVANT VARIABLES
+
+	# Set active buttons for this part: left & right arrows
+	response_manager.set_button_active(1,true); #spacebar
+	response_manager.set_button_active(2,false); #left mouse click
+	response_manager.set_button_active(3,false); #backspace
+	response_manager.set_button_active(4,true); #left arrow key
+	response_manager.set_button_active(5,true); #right arrow key 
+
+	# Adjust size of vehicles	
+	van1.set_load_size(240.0,400.0,0); van1.load();
+	van2.set_load_size(240.0,400.0,0); van2.load();
+	van3.set_load_size(240.0,400.0,0); van3.load();
+	van4.set_load_size(240.0,400.0,0); van4.load();
+	van5.set_load_size(240.0,400.0,0); van5.load();
+	van6.set_load_size(240.0,400.0,0); van6.load();
+	van7.set_load_size(240.0,400.0,0); van7.load();
+	van8.set_load_size(240.0,400.0,0); van8.load();
+	
+	# Reset number of points earned in block and behavioural measures
+	blockpoints = 0;
+	press_corr  = 0;
+	inhib_corr  = 0;
+	press_late  = 0;
+	
+	###############################################
+	# START LOOP OVER TRIALS WITHIN BLOCK
+	
+	loop int tr=1 until tr>blocktrials begin;
+
+		# Get relevant info from matrix
+		int train_respreq;
+		int traincond;
+
+		# determines the current stimulus, outcomes, and response requirements for the trials
+		if (trainORtest == 1 && demoORreal == 0) then #6-block version
+			curr_stim	   = stim_out_set[1][blockstim_stim[bl][tr]];	# current stimulus for trial 
+			curr_outcome   = stim_out_set[2][blockstim_stim[bl][tr]];	# current outcome for trial
+			train_respreq  = stim_out_set[3][blockstim_stim[bl][tr]];	# response requirement for trial
+		else 
+			curr_stim	   = stim_out_set[1][set_nr+trial_order[tr]];
+			curr_outcome   = stim_out_set[2][set_nr+trial_order[tr]];
+			train_respreq  = stim_out_set[3][set_nr+trial_order[tr]];
+		end;
+
+		traincond		= train_respreq;
+		
+		# If test: determine whether the outcome is currently valuable
+		int test_respreq; 
+		int testcond;
+		if     trainORtest==1 then test_respreq=999;	# 1 = training (don't need to determine value for training)
+		elseif trainORtest==2 then	# 2 = test phase
+			if     curr_outcome==test_val_set[bl][1][1] || curr_outcome==test_val_set[bl][1][2] then test_respreq=1;	# should be valuable/yummy, left arrow (preivously spacebar)
+			elseif curr_outcome==test_val_set[bl][2][1] || curr_outcome==test_val_set[bl][2][2] then test_respreq=0;	# should be nonvaluable/bin, right arrow (previously no responses)
+			end;
+		
+			# determine condition depending on value of the outcome in training and test
+			if     train_respreq==1 && test_respreq==1 then testcond=1; # still valuable
+			elseif train_respreq==1 && test_respreq==0 then testcond=2; # devalued
+			elseif train_respreq==0 && test_respreq==1 then testcond=3; # upvalued
+			elseif train_respreq==0 && test_respreq==0 then testcond=4; # still not valuable
+			end;
+		end;
+		
+		# Determine correct response on this trial
+		int 	 curr_respreq;
+		if 	 trainORtest==1 then curr_respreq=train_respreq;	# training
+		elseif trainORtest==2 then curr_respreq=test_respreq;	# testing
+		end;
+		
+		# Reset response counter and other variables
+		resp	     = 0;	# response
+		RT			  = 0;	# reaction time
+		fb_stay	  = 0;	# feedback
+		late		  = 0;	# late responses	 
+		currpoints = 0;	# current points earnt or lost in trial
+	
+		# Vendor and outcome not visible
+		trial_pic.set_part_x(3,-5000);
+		trial_pic.set_part_x(4,-5000);
+		
+		# Determine which stimulus (van or scooter) and outcome (ice cream or pizza) to use in this trial
+		if     demoORreal==1 then	# learning phase (scooter/pizza)
+			trial_pic.set_part(2,scooter_pract_pics[curr_stim]); 											# scooter
+			trial_pic.set_part(3,bmp_pizzaman);																	# pizza delivery man
+			if  	 trainORtest==1 then trial_pic.set_part(4,pizza_pics[curr_outcome]); 			# pizza
+			elseif trainORtest==2 then trial_pic.set_part(4,bmp_pizzabanner);							# pizza banner
+			end;
+		elseif demoORreal==0 then	#training/test phase (vans/ice creams)
+			trial_pic.set_part(2, van_pics[curr_stim]); 														# van
+			trial_pic.set_part(3, bmp_icecreamman);	 														# icecream vendor
+			if     trainORtest<2 then trial_pic.set_part(4,icecream_pics[curr_outcome]); 		# icecream
+			elseif trainORtest==2 then trial_pic.set_part(4,bmp_icecreambanner);						# icecream banner
+			end;
+		end;
+			
+		###############################################
+		# 1. Present ITI
+		
+		
+		int ITI_dur=random(ITImin,ITImax);									# set duration ITI
+		if trainORtest==2 && demoORreal==0 then 
+			ITI_dur=random(ITImin_test,ITImax_test); 
+		elseif trainORtest==0 then
+			ITI_dur = ITI_pavl;
+		end;
+		ITITrial.set_duration(ITI_dur);
+		
+		/*
+		int ITI_dur = iti_time[current_iti];
+		if ( current_iti < 192 ) then current_iti = current_iti + 1; end;
+		ITITrial.set_duration(ITI_dur);
+		
+		if     demoORreal==1 then 		ITIEvent.set_event_code("20");	# set port code for EEG:
+		elseif demoORreal==0 then 												# demo: 		20
+			if     trainORtest==1 then ITIEvent.set_event_code("31");	# training: 31
+			elseif trainORtest==2 then ITIEvent.set_event_code("32");	# test: 		32
+			end;
+		end;
+		*/
+		ITITrial.present();
+
+		###############################################
+		# 2. Present trial (show stimulus, activate response window, track timing & event-related information)
+		
+		int mov_dur_test = mov_dur_test1;
+		if test_run == 2 then
+		mov_dur_test = mov_dur_test2; # **no longer two response window conditions, but left as is
+		end;
+
+		start_resp_nr   = response_manager.total_response_count();
+
+		# Present stimulus / response window
+		trial_pic.set_part_x(3,100);											# show delivery man / vendor
+		trial_pic.set_part_x(2, 50);											# show van
+		runEvent.set_response_active(true);
+		
+		runTrial.set_duration(mov_dur);										# set duration of response window
+		if trainORtest==2 && demoORreal==0 then 
+			runTrial.set_duration(mov_dur_test); 
+		elseif trainORtest==0 then 
+			runTrial.set_duration(mov_dur_pavl);
+		end;
+		
+		int cuecode;
+		if     demoORreal==1 then 		cuecode=21;							# set code for logfile:
+		elseif demoORreal==0 then 												# demo: 		21
+			if     trainORtest==1 then cuecode=60+(iiORgi*2)+(2-traincond);		# training: 61=go, 62=nogo, 63= go-II, 64=ng-II, 65=go-GI, 66=ng-GI
+			elseif trainORtest==2 then cuecode=70+((iiORgi-1)*4)+    testcond;		# test: 		II: 71=sv, 72=de, 73=up, 74=sn, GI: 75=sv, 76=de, 77=up, 78=sn
+			end;
+		end;
+		runEvent.set_event_code(string(cuecode));
+		
+		int trial_start_time=clock.time();		
+		runTrial.present();
+		
+		###############################################		
+		# 3. Check whether a response has been made		
+		get_resp_nr = response_manager.total_response_count();
+		
+		 # If so, store relevant info
+		if get_resp_nr > start_resp_nr then
+			resp = response_manager.last_response(); # get response LINE ADDED
+			if resp == 4 then  # Convert response value 4 (left arrow) to 1 (space bar)
+				resp = 1;
+			elseif resp == 5 then  # Convert response value 5 (right arrow) to 0 (no response)
+				resp = 0;
+			end;
+			
+			# Determine RT
+			stimulus_data resp_time = stimulus_manager.last_stimulus_data();
+			RT = resp_time.reaction_time();
+			response_data rd = response_manager.last_response_data();
+			if ( !is_null(rd) ) then
+				RT_sce = rd.time();
+			else
+				RT_sce = 0;
+			end;
+			
+			# Set initial values
+			late = 0;
+			fb_stay = 1;
+
+			# Set score
+			if resp == curr_respreq then
+				 # correct
+				 currpoints = 1;
+				 blockpoints = blockpoints + 1;
+				 if demoORreal == 0 then
+						totalpoints = totalpoints + 1;
+				 end;
+			else
+				 # incorrect
+				 currpoints = -1;
+				 blockpoints = blockpoints - 1;
+				 if demoORreal == 0 then
+						totalpoints = totalpoints - 1;
+				 end;
+			end;
+		end;
+		
+		###############################################		
+		# 4. Present outcome or delay
+
+		## DURING TRAINING: ALWAYS PRESENT OUTCOME
+#		if 	 trainORtest == 1 then
+		
+			trial_pic.set_part_x(4,0);												# displays outcome on screen
+
+			runEvent.set_response_active(true);									# responses recorded during outcome presentation to record late responses
+			
+			runTrial.set_duration(fb_dur);										# set duration of outcome presentation
+			if trainORtest==2 && demoORreal==0 then 										
+				runTrial.set_duration(fb_dur_test); 
+			elseif trainORtest==0 then 
+				runTrial.set_duration(fb_dur_pavl);
+			end;
+				
+			if     demoORreal==1 then 		runEvent.set_event_code("23");	# set port code for EEG:
+			elseif demoORreal==0 then 													# demo:		23
+				if 	 trainORtest==1 then runEvent.set_event_code("91"); 	# training: 91
+				elseif trainORtest==2 then runEvent.set_event_code("92"); 	# test:		92 => not used because not presented
+				end;
+			end;
+			
+		## DURING TEST: PRESENT DELAY TO RECORD LATE RESPONSES
+#		elseif trainORtest == 2 then
+				
+#			trial_pic.set_part_x(3,-5000);										# remove delivery man / vendor
+#			trial_pic.set_part_x(2,-4500);										# remove van
+				
+			#runTrial.set_duration(delay_dur);									# set duration of delay
+			#if trainORtest==2 && demoORreal==0 then 
+#				runTrial.set_duration(delay_dur_test); 
+			#end;
+			
+#			if     demoORreal==1 then 		runEvent.set_port_code(22);	# set port code for EEG:
+#			elseif demoORreal==0 then 												# demo:		22
+#				if     trainORtest==1 then runEvent.set_port_code(81);	# training:	81
+#				elseif trainORtest==2 then runEvent.set_port_code(82);	# test:		82 => not used because not presented
+#				end;
+#			end;
+		
+#		end;
+	
+		# actually present outcome/delay
+		runEvent.set_response_active(true);									# responses recorded to count late responses
+		start_resp_nr   = response_manager.total_response_count();
+		runTrial.present();
+		
+		###############################################			
+		# 5. Check whether a (late) response was made
+		
+		get_resp_nr = response_manager.total_response_count();
+		
+		# If so, store relevant info
+		if get_resp_nr > start_resp_nr then
+			
+			# Determine RT
+			stimulus_data resp_time = stimulus_manager.last_stimulus_data();
+			if     trainORtest==1 then RT = mov_dur      + resp_time.reaction_time();
+			elseif trainORtest==2 then RT = mov_dur_test + resp_time.reaction_time(); end;
+			
+			# Adjust values
+			resp=1; late=1;
+			press_late=press_late+1;
+		end;		
+					
+		###############################################		
+		# 6. Determine whether the current (non)response was correct **this is where I would change to be right arrow instead of nogo?
+		
+		if late==0 then	# not late (valid response)
+			if 	 resp==curr_respreq then resp_corr=1;		# note: late responses are also considered as responses, so count towards the total that is displayed as feedback 
+				if     resp==1 then press_corr=press_corr+1;	# nr of correct responses/non-responses to report to pp
+				elseif resp==0 then inhib_corr=inhib_corr+1;	# press_corr and inhib_corr are 
+				end;
+			elseif resp!=curr_respreq then resp_corr=0;
+			end;
+		elseif late==1 then resp_corr=2; end;
+		
+		###############################################		
+		# Write output
+		
+		# For training
+		if trainORtest==1 then
+			out_train.print(date_time()					+ "\t");	# Date and time
+			out_train.print(string(iiORgi)				+ "\t");	# IIGI: 1=implementation intentions, 2=goal intentions
+			out_train.print(string(demoORreal)			+ "\t");	# DemoReal: 1 = demo, 2 = real
+			out_train.print(string(trainORtest)			+ "\t");	# TrainTest: 1 = training, 2 = test
+			out_train.print(string(start_intention)	+ "\t");	# start intention: 1 --> oneven=implementation intentions, even=goal intentions
+			out_train.print(string(no_val_screen)		+ "\t");	# value screen: 1 = no val screen, 0 = val screen shown
+			out_train.print(string(mri)					+ "\t");	# mri: is this part in the scanner? i.e. waiting for trigger?
+			out_train.print(string(bl)						+ "\t");	# Blocknr			
+			out_train.print(string(tr)	 					+ "\t"); # Trial nr
+			out_train.print(string(train_respreq)		+ "\t");	# Response required or not	in training
+			out_train.print(string(test_respreq)		+ "\t");	# Response required or not in test 
+			out_train.print(string(traincond) 			+ "\t"); # Condition for training			
+			out_train.print(string(set_nr) 				+ "\t"); # Which set of pictures to use: 0 = set 1, 4 = set 2 (adjust?)
+			out_train.print(string(curr_stim)			+ "\t");	# Stimulus
+			out_train.print(string(curr_outcome)		+ "\t");	# Outcome
+			out_train.print(string(resp)					+ "\t");	# Response given (1) or not (0)
+			out_train.print(string(RT)						+ "\t");	# Reaction time
+			out_train.print(string(RT_sce)			+ "\t");	# Reaction scenario time
+			out_train.print(string(fb_stay)				+ "\t");	# Present FB (outcome) or not
+			out_train.print(string(resp_corr)			+ "\t");	# Response or lack thereof correct or not
+			out_train.print(string(ITI_dur)						+ "\t");	# ITI
+			out_train.print(string(trial_start_time)		+ "\t");	# stimulus onset time
+			out_train.print(string(currpoints)			+ "\t");	# Points gained/lost on this trial
+			out_train.print(string(blockpoints)			+ "\t");	# Points gained/lost in this block
+			out_train.print(string(totalpoints)			+ "\n");	# Points gained/lost in total
+		
+		# For test
+		elseif trainORtest==2 then
+			out_test.print(date_time()						+ "\t");	# Date and time
+			out_test.print(string(iiORgi)					+ "\t");	# IIGI: 1=implementation intentions, 2=goal intentions			
+			out_test.print(string(demoORreal)			+ "\t");	# DemoReal: 1 = demo, 2 = real
+			out_test.print(string(trainORtest)			+ "\t");	# TrainTest: 1 = training, 2 = test
+			out_test.print(string(start_intention)	+ "\t");	# start intention: 1 --> oneven=implementation intentions, even=goal intentions
+			out_test.print(string(no_val_screen)		+ "\t");	# value screen: 1 = no val screen, 0 = val screen shown
+			out_test.print(string(mri)					+ "\t");	# mri: is this part in the scanner? i.e. waiting for trigger?
+			out_test.print(string(bl)						+ "\t");	# Blocknr
+			out_test.print(string(tr)	 					+ "\t"); # Trial nr
+			out_test.print(string(train_respreq)		+ "\t");	# Response required or not	in training
+			out_test.print(string(test_respreq)			+ "\t");	# Response required or not in test
+			out_test.print(string(testcond) 				+ "\t"); # Condition for test
+			out_test.print(string(set_nr) 				+ "\t"); # Which set of pictures to use: 0 = set 1, 4 = set 2 (adjust?)
+			out_test.print(string(curr_stim) 			+ "\t");	# Stimulus
+			out_test.print(string(curr_outcome) 		+ "\t");	# Outcome
+			out_test.print(string(resp)					+ "\t");	# Response given (1) or not (0)
+			out_test.print(string(RT)						+ "\t");	# Reaction time
+			out_test.print(string(RT_sce)			+ "\t");	# Reaction scenario time
+			out_test.print(string(fb_stay)				+ "\t");	# Present FB (outcome) or not
+			out_test.print(string(resp_corr)				+ "\t");	# Response or lack thereof correct or not
+			out_test.print(string(ITI_dur)				+ "\t");	# ITI
+			out_test.print(string(trial_start_time)	+ "\t");	# stimulus onset time
+			out_test.print(string(currpoints)			+ "\t");	# Points gained/lost on this trial
+			out_test.print(string(blockpoints)			+ "\t");	# Points gained/lost in this block
+			out_test.print(string(totalpoints)			+ "\n");	# Points gained/lost in total
+		end;
+		
+		tr=tr+1;
+		
+	end; # end trial loop
+
+end;
