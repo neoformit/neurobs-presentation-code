@@ -7,6 +7,16 @@
 #######################################################
 
 sub run_trials begin;
+
+
+	tmp_fn  = "SneakySnack_" + logfile.subject() + "_debug.txt";
+	out_debug = new output_file;
+	out_debug.open_append(tmp_fn);
+	out_debug.print("trial\t");
+	out_debug.print("curr_respreq\t");
+	out_debug.print("resp\t");
+	out_debug.print("resp_converted\n");
+
 	
 	###############################################
 	# SET RELEVANT VARIABLES
@@ -38,6 +48,8 @@ sub run_trials begin;
 	# START LOOP OVER TRIALS WITHIN BLOCK
 	
 	loop int tr=1 until tr>blocktrials begin;
+
+		out_debug.print(string(trial) + "\t");
 
 		# Get relevant info from matrix
 		int train_respreq;
@@ -80,12 +92,12 @@ sub run_trials begin;
 		end;
 		
 		# Reset response counter and other variables
-		resp	     = 0; 
-		RT			  = 0;
-		fb_stay	  = 0;
-		late		  = 0;	 
-		currpoints = 0;
-	
+		resp		= 0;
+		RT			= 0;
+		fb_stay		= 0;
+		late		= 0;
+		currpoints	= 0;
+
 		# Vendor and outcome not visible
 		trial_pic.set_part_x(3,-5000);
 		trial_pic.set_part_x(4,-5000);
@@ -168,16 +180,24 @@ sub run_trials begin;
 		###############################################		
 		# 3. Check whether a response has been made		
 		get_resp_nr = response_manager.total_response_count();
-		
+
 		 # If so, store relevant info
 		if get_resp_nr > start_resp_nr then
-			int response_value = response_manager.last_response(); # get response LINE ADDED
-			if resp == 4 then  # Convert response value 4 to 1
+			resp = response_manager.last_response();
+
+			out_debug.print(string(curr_respreq) + "\t");
+			out_debug.print(string(resp) + "\t");
+
+			if resp == 4 then
+				# Convert response value 4 to 1
 				resp = 1;
-			elseif resp == 5 then  # Convert response value 5 to 0
+			elseif resp == 5 then
+				# Convert response value 5 to 0
 				resp = 0;
 			end;
-			
+
+			out_debug.print(string(resp) + "\t");
+
 			# Determine RT
 			stimulus_data resp_time = stimulus_manager.last_stimulus_data();
 			RT = resp_time.reaction_time();
@@ -208,7 +228,15 @@ sub run_trials begin;
 						totalpoints = totalpoints - 1;
 				 end;
 			end;
-		end;		
+
+		else
+			# No response made
+			out_debug.print("-\n");
+			late = 1; #?
+			fb_stay = 0; #?
+			currpoints = 0;
+			# Do we subtract points for this?
+		end;
 
 		###############################################		
 		# 4. Present outcome or delay
